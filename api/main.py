@@ -6,7 +6,7 @@ FastAPI backend serving predictions, source attribution, enforcement intel, and 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import stations, forecast, attribution, enforcement, advisory
+from routers import stations, forecast, attribution, enforcement, advisory, agents
 
 app = FastAPI(
     title="AERIS API",
@@ -29,6 +29,7 @@ app.include_router(forecast.router, prefix="/api/forecast", tags=["Forecast"])
 app.include_router(attribution.router, prefix="/api/attribution", tags=["Attribution"])
 app.include_router(enforcement.router, prefix="/api/enforcement", tags=["Enforcement"])
 app.include_router(advisory.router, prefix="/api/advisory", tags=["Advisory"])
+app.include_router(agents.router, prefix="/api/agents", tags=["Multi-Agent Pipeline"])
 
 
 @app.get("/")

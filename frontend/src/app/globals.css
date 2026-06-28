@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Theme tokens ===== */
+:root {
+  /* Light theme */
+  --bg-base: #f8fafc;
+  --bg-elevated: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent: #0891b2;
+  --accent-soft: rgba(8, 145, 178, 0.1);
+  --map-tiles: "light";
+}
+
+.dark {
+  /* Dark theme */
+  --bg-base: #070b14;
+  --bg-elevated: #0e1525;
+  --bg-subtle: #131c2e;
+  --border: #1e293b;
+  --border-strong: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #22d3ee;
+  --accent-soft: rgba(34, 211, 238, 0.1);
+  --map-tiles: "dark";
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===== Ambient background gradient ===== */
+.app-bg {
+  position: relative;
+  background:
+    radial-gradient(900px circle at 0% 0%, var(--accent-soft), transparent 40%),
+    radial-gradient(700px circle at 100% 100%, var(--accent-soft), transparent 45%),
+    var(--bg-base);
+}
+
+/* ===== Component utilities ===== */
+@layer components {
+  .surface {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    @apply rounded-2xl;
+  }
+
+  .surface-subtle {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    @apply rounded-xl;
+  }
+
+  .glass {
+    background: color-mix(in srgb, var(--bg-elevated) 75%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+  }
+
+  .card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    @apply rounded-2xl p-6 transition-all duration-300;
+  }
+
+  .card:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-header {
+    @apply text-base font-semibold mb-4;
+    color: var(--text-primary);
+  }
+
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+
+  .text-muted {
+    color: var(--text-muted);
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 rounded-xl text-sm font-medium text-white transition-all duration-200;
+    background: linear-gradient(135deg, #0891b2, #0e7490);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 4px 20px rgba(8, 145, 178, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .nav-item {
+    @apply w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200;
+    color: var(--text-secondary);
+  }
+  .nav-item:hover {
+    background: var(--bg-subtle);
+    color: var(--text-primary);
+  }
+  .nav-item-active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+}
+
+/* ===== Leaflet theming ===== */
+.leaflet-container {
+  background: var(--bg-subtle);
+  font-family: inherit;
+}
+.leaflet-popup-content-wrapper {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+}
+.leaflet-popup-tip {
+  background: var(--bg-elevated);
+}
+.leaflet-bar a {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+.leaflet-bar a:hover {
+  background: var(--bg-subtle);
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ===== Shimmer skeleton ===== */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-subtle) 25%,
+    var(--border) 50%,
+    var(--bg-subtle) 75%
+  );
+  background-size: 200% 100%;
+  @apply animate-shimmer;
+}
+
+/* ===== Typing dots ===== */
+.typing-dot {
+  @apply inline-block w-1.5 h-1.5 rounded-full;
+  background: var(--text-muted);
+  animation: typingBounce 1.4s infinite ease-in-out both;
+}
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}

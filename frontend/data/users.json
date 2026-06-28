@@ -1,0 +1,18 @@
+[
+  {
+    "id": "user_demo_citizen",
+    "email": "citizen@aeris.io",
+    "name": "Demo Citizen",
+    "password": "$2b$12$orA6vrUqfQBf2LWdKDvPyODCN/EqLbe6hSNvNKaYHsZxLur.aX84.",
+    "role": "citizen",
+    "createdAt": "2026-06-28T17:45:08.012Z"
+  },
+  {
+    "id": "user_demo_authority",
+    "email": "admin@aeris.io",
+    "name": "DPCC Officer",
+    "password": "$2b$12$qiWehQnrz/bWc8uRNHllTO5zz54oWM9RLGifDPo.IE.1K09dGyDoW",
+    "role": "authority",
+    "createdAt": "2026-06-28T17:45:08.213Z"
+  }
+]

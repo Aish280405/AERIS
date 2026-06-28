@@ -12,13 +12,9 @@ import EnforcementPanel from "@/components/EnforcementPanel";
 import AdvisoryPanel from "@/components/AdvisoryPanel";
 import AIAssistant from "@/components/AIAssistant";
 import CitizenDashboard from "@/components/CitizenDashboard";
+import type { View } from "@/lib/types";
 
-export type View =
-  | "map"
-  | "forecast"
-  | "attribution"
-  | "enforcement"
-  | "advisory";
+export type { View };
 
 const viewTitles: Record<View, { title: string; subtitle: string }> = {
   map: {
@@ -40,7 +36,7 @@ const viewTitles: Record<View, { title: string; subtitle: string }> = {
   },
 };
 
-export default function Home() {
+export default function DashboardPage() {
   const { data: session, status } = useSession();
   const [activeView, setActiveView] = useState<View>("map");
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
@@ -66,12 +62,11 @@ export default function Home() {
   const isAuthority = userRole === "authority";
 
   // ═══════════════════════════════════════════
-  // CITIZEN VIEW — clean, simple, personal
+  // CITIZEN VIEW
   // ═══════════════════════════════════════════
   if (!isAuthority) {
     return (
       <div className="app-bg min-h-screen">
-        {/* Citizen top bar */}
         <header className="glass border-b sticky top-0 z-30">
           <div className="max-w-4xl mx-auto flex items-center justify-between px-6 h-16">
             <div className="flex items-center gap-3">
@@ -85,12 +80,13 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-base font-bold leading-tight">AERIS</h1>
-                <p className="text-[10px] text-muted">Your Air Quality Companion</p>
+                <p className="text-[10px] text-muted">
+                  Your Air Quality Companion
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              {/* AI button */}
               <button
                 onClick={() => setAssistantOpen(true)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-white transition-all hover:scale-105"
@@ -105,7 +101,6 @@ export default function Home() {
                 Ask AI
               </button>
 
-              {/* User */}
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl surface-subtle text-xs text-secondary hover:text-[var(--text-primary)] transition-colors"
@@ -118,12 +113,10 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Citizen content */}
         <main className="max-w-4xl mx-auto p-6">
           <CitizenDashboard />
         </main>
 
-        {/* AI Assistant */}
         <AIAssistant
           open={assistantOpen}
           onClose={() => setAssistantOpen(false)}
@@ -134,7 +127,7 @@ export default function Home() {
   }
 
   // ═══════════════════════════════════════════
-  // AUTHORITY VIEW — full operational dashboard
+  // AUTHORITY VIEW
   // ═══════════════════════════════════════════
   const renderView = () => {
     switch (activeView) {

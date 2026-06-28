@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { X, Send, Sparkles, Bot, User } from "lucide-react";
-import type { View } from "@/app/page";
+import type { View } from "@/lib/types";
 
 interface AIAssistantProps {
   open: boolean;

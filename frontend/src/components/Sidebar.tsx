@@ -10,8 +10,8 @@ import {
   ChevronLeft,
   Sparkles,
 } from "lucide-react";
-import type { View } from "@/app/page";
-import type { UserRole } from "@/lib/auth";
+import type { View } from "@/lib/types";
+import type { UserRole } from "@/lib/types";
 
 interface SidebarProps {
   activeView: View;

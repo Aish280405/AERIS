@@ -18,72 +18,11 @@ import {
   Minus,
   ChevronDown,
 } from "lucide-react";
-
-type Lang = "en" | "hi";
-
-// ─── Translations ───────────────────────────────────
-const t = {
-  en: {
-    airQualityAt: "Air Quality at",
-    forecast3Day: "3-Day Forecast",
-    healthAdvisory: "Health Advisory",
-    pollutantLevels: "Pollutant Levels",
-    aboveSafeLimit: "Above safe limit",
-    worsening: "Worsening",
-    improving: "Improving",
-    stable: "Stable",
-    humidity: "humidity",
-    selectLocation: "Select your location",
-    day: "Day",
-    categories: {
-      Good: "Good",
-      Satisfactory: "Satisfactory",
-      Moderate: "Moderate",
-      Poor: "Poor",
-      "Very Poor": "Very Poor",
-      Severe: "Severe",
-    } as Record<string, string>,
-    descriptions: {
-      Good: "Minimal impact on health",
-      Satisfactory: "Minor discomfort to sensitive people",
-      Moderate: "Breathing discomfort for those with lung/heart disease",
-      Poor: "Breathing discomfort on prolonged exposure",
-      "Very Poor": "Respiratory illness on prolonged exposure",
-      Severe: "Serious health impact even on healthy people",
-    } as Record<string, string>,
-  },
-  hi: {
-    airQualityAt: "हवा की गुणवत्ता",
-    forecast3Day: "3-दिन का पूर्वानुमान",
-    healthAdvisory: "स्वास्थ्य सलाह",
-    pollutantLevels: "प्रदूषक स्तर",
-    aboveSafeLimit: "सुरक्षित सीमा से ऊपर",
-    worsening: "बिगड़ रहा है",
-    improving: "सुधर रहा है",
-    stable: "स्थिर",
-    humidity: "आर्द्रता",
-    selectLocation: "अपना स्थान चुनें",
-    day: "दिन",
-    categories: {
-      Good: "अच्छा",
-      Satisfactory: "संतोषजनक",
-      Moderate: "मध्यम",
-      Poor: "खराब",
-      "Very Poor": "बहुत खराब",
-      Severe: "गंभीर",
-    } as Record<string, string>,
-    descriptions: {
-      Good: "स्वास्थ्य पर न्यूनतम प्रभाव",
-      Satisfactory: "संवेदनशील लोगों को मामूली असुविधा",
-      Moderate: "फेफड़े/हृदय रोगियों को सांस की तकलीफ",
-      Poor: "लंबे समय बाहर रहने पर सांस की तकलीफ",
-      "Very Poor": "लंबे समय बाहर रहने पर श्वसन बीमारी",
-      Severe: "स्वस्थ लोगों पर भी गंभीर प्रभाव",
-    } as Record<string, string>,
-  },
-};
+import { useLanguage } from "@/lib/language";
+import { translations } from "@/lib/i18n";
 
 // ─── Advisories ─────────────────────────────────────
+type Lang = "en" | "hi";
 const advisories: Record<Lang, Record<string, { msg: string; tips: string[] }>> = {
   en: {
     Good: {
@@ -166,10 +105,9 @@ export default function CitizenDashboard() {
   const [selectedStationId, setSelectedStationId] = useState(
     stations[0].station_id
   );
-  const [language, setLanguage] = useState<Lang>("en");
+  const { language, setLanguage, t: strings } = useLanguage();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const strings = t[language];
   const station = stations.find((s) => s.station_id === selectedStationId)!;
   const aqi = mockAqiForStation(selectedStationId);
   const category = getAqiCategory(aqi);

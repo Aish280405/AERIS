@@ -36,21 +36,18 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen app-bg flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-            style={{ background: "linear-gradient(135deg, #06b6d4, #3b82f6)" }}>
-            <Wind size={32} className="text-white" />
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 bg-[var(--accent)]">
+            <Wind size={24} className="text-white" />
           </div>
-          <h1 className="text-3xl font-bold gradient-text">AERIS</h1>
-          <p className="text-sm text-muted mt-2">Urban AQI Intelligence Platform</p>
+          <h1 className="text-2xl font-bold">Welcome back</h1>
+          <p className="text-sm text-muted mt-1">Sign in to AERIS</p>
         </div>
 
         {/* Login card */}
         <div className="card">
-          <h2 className="text-xl font-bold mb-1">Welcome back</h2>
-          <p className="text-sm text-muted mb-6">Sign in to your account</p>
 
           {error && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm mb-4">
@@ -85,7 +82,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary py-3 flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full btn-primary py-3 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -52,20 +52,19 @@ FALLBACK_TEMPLATES = {
 class AdvisoryAgent:
     """Generates citizen health advisories using Gemini LLM."""
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: Optional[str] = None, enable_llm: bool = False):
         self.api_key = api_key or GEMINI_API_KEY
-        self.status = "gemini" if (self.api_key and HAS_HTTPX) else "template"
-        if self.api_key and HAS_HTTPX:
-            print("✓ AdvisoryAgent: Gemini API key configured")
-        elif not HAS_HTTPX:
-            print("⚠ AdvisoryAgent: httpx not installed, using template fallback")
+        self.enable_llm = enable_llm
+        self.status = "gemini" if (self.api_key and HAS_HTTPX and enable_llm) else "template"
+        if self.api_key and HAS_HTTPX and enable_llm:
+            print("✓ AdvisoryAgent: Gemini LLM enabled")
         else:
-            print("⚠ AdvisoryAgent: No GEMINI_API_KEY, using template fallback")
+            print("⚠ AdvisoryAgent: Template mode (LLM reserved for chat)")
 
     async def generate_advisory_with_context(self, context: Dict) -> Dict:
         """
         Generate advisory using full upstream context.
-        Tries Gemini first, falls back to templates.
+        Tries Gemini first (if enable_llm=True), falls back to templates.
         """
         language = context.get("language", "en")
         aqi = context.get("current_aqi", 200)
@@ -73,7 +72,7 @@ class AdvisoryAgent:
         dominant_source = context.get("dominant_source", "unknown")
         attribution = context.get("attribution", {})
 
-        if self.api_key and HAS_HTTPX:
+        if self.api_key and HAS_HTTPX and self.enable_llm:
             try:
                 llm_response = await self._call_gemini(
                     aqi=aqi,

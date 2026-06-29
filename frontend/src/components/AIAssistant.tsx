@@ -3,6 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Send, Sparkles, Bot, User } from "lucide-react";
 import type { View } from "@/lib/types";
+import { stations } from "@/lib/data";
+import { useLanguage } from "@/lib/language";
+import { useSession } from "next-auth/react";
 
 interface AIAssistantProps {
   open: boolean;
@@ -15,18 +18,39 @@ interface Message {
   content: string;
 }
 
-const suggestedPrompts = [
+const API_BASE = "http://localhost:8000";
+
+const suggestedPromptsCitizen = [
+  "How is the air quality near me today?",
+  "Is it safe for my kids to play outside?",
+  "What precautions should I take this week?",
+  "Why is pollution high today?",
+];
+
+const suggestedPromptsAuthority = [
   "What's causing high pollution in Anand Vihar?",
-  "Forecast AQI for the next 3 days",
-  "Where should inspectors be deployed today?",
-  "Is it safe for kids to play outside?",
+  "Where should we deploy inspectors today?",
+  "Show me the forecast for next 3 days at ITO",
+  "Which areas need urgent intervention?",
 ];
 
 const welcomeMessage: Message = {
   role: "assistant",
   content:
-    "Hi! I'm the AERIS AI Agent. I can explain pollution sources, interpret forecasts, recommend enforcement actions, and generate health advisories. Ask me anything about Delhi's air quality.",
+    "Hi! I'm the AERIS AI Agent. I can help you understand air quality in Delhi — forecasts, health advice, and what's causing pollution in your area. What would you like to know?",
 };
+
+// Try to detect which station the user is asking about
+function findStationFromQuery(query: string): string | null {
+  const lower = query.toLowerCase();
+  for (const s of stations) {
+    const name = s.station_name.toLowerCase().split(",")[0].trim();
+    if (lower.includes(name)) return s.station_id;
+    const idName = s.station_id.replace("delhi_", "").replace(/_/g, " ");
+    if (lower.includes(idName)) return s.station_id;
+  }
+  return null;
+}
 
 export default function AIAssistant({
   open,
@@ -37,6 +61,12 @@ export default function AIAssistant({
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage();
+  const { data: session } = useSession();
+
+  const userRole = session?.user?.role || "citizen";
+  const suggestedPrompts =
+    userRole === "authority" ? suggestedPromptsAuthority : suggestedPromptsCitizen;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -45,26 +75,58 @@ export default function AIAssistant({
     });
   }, [messages, thinking]);
 
-  const handleSend = (text?: string) => {
+  const handleSend = async (text?: string) => {
     const content = (text ?? input).trim();
-    if (!content) return;
+    if (!content || thinking) return;
 
     setMessages((m) => [...m, { role: "user", content }]);
     setInput("");
     setThinking(true);
 
-    // Placeholder — will connect to /agents backend once implemented
-    setTimeout(() => {
-      setThinking(false);
+    try {
+      // Detect station from query or use current context
+      const stationId =
+        findStationFromQuery(content) || context.station || "delhi_anand_vihar";
+
+      const res = await fetch(`${API_BASE}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: content,
+          station_id: stationId,
+          role: userRole,
+          language,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", content: data.response },
+        ]);
+      } else {
+        setMessages((m) => [
+          ...m,
+          {
+            role: "assistant",
+            content:
+              "⚠️ Couldn't reach the AI. Make sure the backend is running:\n\ncd api && python3 -m uvicorn main:app --reload --port 8000",
+          },
+        ]);
+      }
+    } catch {
       setMessages((m) => [
         ...m,
         {
           role: "assistant",
           content:
-            "🚧 The AI Agent isn't connected yet. Once the backend agents (source attribution, enforcement, advisory) are wired up, I'll answer this using live model predictions and SHAP analysis. For now, explore the dashboard panels to see the data.",
+            "⚠️ Connection error. Start the backend:\n\ncd api && python3 -m uvicorn main:app --reload --port 8000",
         },
       ]);
-    }, 1200);
+    } finally {
+      setThinking(false);
+    }
   };
 
   return (
@@ -94,14 +156,15 @@ export default function AIAssistant({
             </div>
             <div>
               <h3 className="font-bold leading-tight flex items-center gap-2">
-                AERIS AI Agent
-                <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-amber-500/15 text-amber-500 uppercase tracking-wide">
-                  Beta
+                AERIS AI
+                <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-emerald-500/15 text-emerald-500 uppercase tracking-wide">
+                  Live
                 </span>
               </h3>
               <p className="text-[11px] text-muted">
-                Context: {context.view}
-                {context.station ? ` · ${context.station}` : ""}
+                {userRole === "authority"
+                  ? "Full intelligence access"
+                  : "Health & air quality assistant"}
               </p>
             </div>
           </div>
@@ -139,7 +202,7 @@ export default function AIAssistant({
                 )}
               </div>
               <div
-                className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${
                   msg.role === "user"
                     ? "text-white rounded-tr-sm"
                     : "surface-subtle rounded-tl-sm"
@@ -205,12 +268,16 @@ export default function AIAssistant({
                 }
               }}
               rows={1}
-              placeholder="Ask AERIS AI…"
+              placeholder={
+                language === "en"
+                  ? "Ask about air quality..."
+                  : "वायु गुणवत्ता के बारे में पूछें..."
+              }
               className="flex-1 bg-transparent text-sm outline-none resize-none max-h-24 py-1.5 placeholder:text-muted"
             />
             <button
               onClick={() => handleSend()}
-              disabled={!input.trim()}
+              disabled={!input.trim() || thinking}
               className="flex items-center justify-center w-9 h-9 rounded-xl text-white shrink-0 transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:scale-105"
               style={{ background: "linear-gradient(135deg, #06b6d4, #3b82f6)" }}
             >
@@ -218,7 +285,9 @@ export default function AIAssistant({
             </button>
           </div>
           <p className="text-[10px] text-muted text-center mt-2">
-            AI responses are placeholders until agents are connected
+            {userRole === "authority"
+              ? "Full pipeline: Forecast → Attribution → Enforcement → Advisory"
+              : "Answers limited to air quality & health topics"}
           </p>
         </div>
       </aside>

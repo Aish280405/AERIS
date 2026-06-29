@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Moon, Sun, Sparkles, Search, Bell, LogOut, User, Shield } from "lucide-react";
-import { useTheme } from "@/lib/theme";
+import { Sparkles, Search, Bell, LogOut, User, Shield } from "lucide-react";
+import { useLanguage } from "@/lib/language";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface TopBarProps {
   title: string;
@@ -21,7 +22,7 @@ export default function TopBar({
   user,
   onSignOut,
 }: TopBarProps) {
-  const { theme, toggleTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const [showProfile, setShowProfile] = useState(false);
 
   return (
@@ -33,54 +34,52 @@ export default function TopBar({
 
       <div className="flex items-center gap-2">
         {/* Search */}
-        <div className="hidden md:flex items-center gap-2 surface-subtle px-3 py-2 w-56">
+        <div className="hidden md:flex items-center gap-2 surface-subtle px-3 py-2 w-52">
           <Search size={15} className="text-muted shrink-0" />
           <input
-            placeholder="Search stations, wards…"
+            placeholder={language === "en" ? "Search stations…" : "स्टेशन खोजें…"}
             className="bg-transparent text-sm outline-none w-full placeholder:text-muted"
           />
         </div>
 
+        {/* Language toggle */}
+        <div className="flex items-center surface-subtle rounded-lg overflow-hidden">
+          <button
+            onClick={() => setLanguage("en")}
+            className={`px-2.5 py-2 text-xs font-medium transition-all ${
+              language === "en" ? "text-white bg-[var(--accent)]" : "text-secondary hover:text-[var(--text-primary)]"
+            }`}
+          >
+            EN
+          </button>
+          <button
+            onClick={() => setLanguage("hi")}
+            className={`px-2.5 py-2 text-xs font-medium transition-all ${
+              language === "hi" ? "text-white bg-[var(--accent)]" : "text-secondary hover:text-[var(--text-primary)]"
+            }`}
+          >
+            हि
+          </button>
+        </div>
+
         {/* Notifications */}
-        <button className="relative flex items-center justify-center w-10 h-10 rounded-xl surface-subtle transition-colors hover:border-strong">
-          <Bell size={17} className="text-secondary" />
-          <span className="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-rose-500" />
+        <button className="relative flex items-center justify-center w-9 h-9 rounded-lg surface-subtle transition-colors">
+          <Bell size={16} className="text-secondary" />
+          <span className="absolute top-1.5 right-2 w-2 h-2 rounded-full bg-rose-500" />
         </button>
 
-        {/* Theme toggle */}
-        <button
-          onClick={toggleTheme}
-          className="relative flex items-center justify-center w-10 h-10 rounded-xl surface-subtle transition-colors hover:border-strong overflow-hidden"
-          title={theme === "dark" ? "Switch to light" : "Switch to dark"}
-        >
-          <Sun
-            size={17}
-            className={`absolute text-amber-500 transition-all duration-300 ${
-              theme === "dark"
-                ? "opacity-0 rotate-90 scale-0"
-                : "opacity-100 rotate-0 scale-100"
-            }`}
-          />
-          <Moon
-            size={17}
-            className={`absolute text-brand-300 transition-all duration-300 ${
-              theme === "dark"
-                ? "opacity-100 rotate-0 scale-100"
-                : "opacity-0 -rotate-90 scale-0"
-            }`}
-          />
-        </button>
+        {/* Theme toggle — shared component */}
+        <ThemeToggle />
 
         {/* AI assistant */}
         <button
           onClick={onOpenAssistant}
-          className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-sm font-medium text-white transition-all duration-200 ${
-            assistantOpen ? "opacity-60" : "hover:scale-105"
+          className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg text-sm font-medium text-white bg-[var(--accent)] transition-all duration-200 ${
+            assistantOpen ? "opacity-60" : "hover:bg-[var(--accent-hover)]"
           }`}
-          style={{ background: "linear-gradient(135deg, #06b6d4, #3b82f6)" }}
         >
-          <Sparkles size={16} />
-          <span className="hidden sm:inline">AI Agent</span>
+          <Sparkles size={15} />
+          <span className="hidden sm:inline">{t.askAI}</span>
         </button>
 
         {/* User profile */}
@@ -88,51 +87,34 @@ export default function TopBar({
           <div className="relative">
             <button
               onClick={() => setShowProfile(!showProfile)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl surface-subtle transition-colors hover:border-strong"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg surface-subtle transition-colors"
             >
-              <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-brand-500/15 text-brand-400">
-                {user.role === "authority" ? (
-                  <Shield size={14} />
-                ) : (
-                  <User size={14} />
-                )}
+              <div className="flex items-center justify-center w-6 h-6 rounded-md bg-[var(--accent-soft)] text-[var(--accent)]">
+                {user.role === "authority" ? <Shield size={12} /> : <User size={12} />}
               </div>
-              <div className="hidden lg:block text-left">
-                <p className="text-xs font-medium leading-tight">
-                  {user.name || "User"}
-                </p>
-                <p className="text-[10px] text-muted capitalize">
-                  {user.role || "citizen"}
-                </p>
-              </div>
+              <span className="hidden lg:block text-xs font-medium">
+                {user.name || "User"}
+              </span>
             </button>
 
-            {/* Dropdown */}
             {showProfile && (
               <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setShowProfile(false)}
-                />
-                <div className="absolute right-0 top-12 z-50 w-56 surface p-2 shadow-xl animate-slide-up">
+                <div className="fixed inset-0 z-40" onClick={() => setShowProfile(false)} />
+                <div className="absolute right-0 top-12 z-50 w-52 surface p-2 shadow-xl animate-slide-up">
                   <div className="px-3 py-2 border-b mb-2">
                     <p className="text-sm font-medium">{user.name}</p>
                     <p className="text-xs text-muted">{user.email}</p>
-                    <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide bg-brand-500/10 text-brand-400">
-                      {user.role === "authority" ? (
-                        <Shield size={10} />
-                      ) : (
-                        <User size={10} />
-                      )}
+                    <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-[var(--accent-soft)] text-[var(--accent)]">
+                      {user.role === "authority" ? <Shield size={9} /> : <User size={9} />}
                       {user.role}
                     </span>
                   </div>
                   <button
                     onClick={onSignOut}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-rose-500 hover:bg-rose-500/10 transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-rose-500 hover:bg-rose-500/10 transition-colors"
                   >
-                    <LogOut size={15} />
-                    Sign Out
+                    <LogOut size={14} />
+                    {t.signOut}
                   </button>
                 </div>
               </>

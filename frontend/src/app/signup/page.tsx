@@ -58,27 +58,19 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen app-bg flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
           <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-            style={{ background: "linear-gradient(135deg, #06b6d4, #3b82f6)" }}
+            className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 bg-[var(--accent)]"
           >
-            <Wind size={32} className="text-white" />
+            <Wind size={24} className="text-white" />
           </div>
-          <h1 className="text-3xl font-bold gradient-text">AERIS</h1>
-          <p className="text-sm text-muted mt-2">
-            Urban AQI Intelligence Platform
-          </p>
+          <h1 className="text-2xl font-bold">Create Account</h1>
+          <p className="text-sm text-muted mt-1">Join the air quality network</p>
         </div>
 
-        {/* Signup card */}
         <div className="card">
-          <h2 className="text-xl font-bold mb-1">Create Account</h2>
-          <p className="text-sm text-muted mb-6">
-            Join the air quality intelligence network
-          </p>
 
           {error && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm mb-4">

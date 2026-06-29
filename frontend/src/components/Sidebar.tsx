@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import type { View } from "@/lib/types";
 import type { UserRole } from "@/lib/types";
+import { useLanguage } from "@/lib/language";
 
 interface SidebarProps {
   activeView: View;
@@ -23,16 +24,16 @@ interface SidebarProps {
 
 const navItems: {
   id: View;
-  label: string;
+  labelKey: "mapDashboard" | "forecasts" | "sourceAttribution" | "enforcement" | "healthAdvisory";
   icon: React.ReactNode;
   badge?: string;
   authorityOnly?: boolean;
 }[] = [
-  { id: "map", label: "Map Dashboard", icon: <Map size={19} /> },
-  { id: "forecast", label: "Forecasts", icon: <BarChart3 size={19} /> },
-  { id: "attribution", label: "Source Attribution", icon: <PieChart size={19} /> },
-  { id: "enforcement", label: "Enforcement", icon: <Shield size={19} />, badge: "5", authorityOnly: true },
-  { id: "advisory", label: "Health Advisory", icon: <HeartPulse size={19} /> },
+  { id: "map", labelKey: "mapDashboard", icon: <Map size={19} /> },
+  { id: "forecast", labelKey: "forecasts", icon: <BarChart3 size={19} /> },
+  { id: "attribution", labelKey: "sourceAttribution", icon: <PieChart size={19} /> },
+  { id: "enforcement", labelKey: "enforcement", icon: <Shield size={19} />, badge: "5", authorityOnly: true },
+  { id: "advisory", labelKey: "healthAdvisory", icon: <HeartPulse size={19} /> },
 ];
 
 export default function Sidebar({
@@ -42,6 +43,8 @@ export default function Sidebar({
   onToggleCollapse,
   userRole,
 }: SidebarProps) {
+  const { t } = useLanguage();
+
   return (
     <aside
       className="relative flex flex-col glass border-r transition-all duration-300"
@@ -50,8 +53,7 @@ export default function Sidebar({
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 h-[73px] border-b shrink-0">
         <div
-          className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
-          style={{ background: "linear-gradient(135deg, #06b6d4, #3b82f6)" }}
+          className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0 bg-[var(--accent)]"
         >
           <Wind size={22} className="text-white" />
         </div>
@@ -71,7 +73,7 @@ export default function Sidebar({
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {!collapsed && (
           <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
-            Platform
+            {t.platform}
           </p>
         )}
         {navItems
@@ -82,7 +84,7 @@ export default function Sidebar({
             <button
               key={item.id}
               onClick={() => onViewChange(item.id)}
-              title={collapsed ? item.label : undefined}
+              title={collapsed ? t[item.labelKey] : undefined}
               className={`nav-item ${active ? "nav-item-active" : ""} ${
                 collapsed ? "justify-center" : ""
               }`}
@@ -91,7 +93,7 @@ export default function Sidebar({
               {!collapsed && (
                 <>
                   <span className="flex-1 text-left whitespace-nowrap">
-                    {item.label}
+                    {t[item.labelKey]}
                   </span>
                   {item.badge && (
                     <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-rose-500/15 text-rose-500">

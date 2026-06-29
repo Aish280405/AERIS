@@ -12,9 +12,13 @@ import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
 
 from routers import stations, forecast, attribution, enforcement, advisory, agents
-from routers import cached
+from routers import cached, chat
 from cache import get_cache
 from scheduler import get_scheduler
 
@@ -60,6 +64,9 @@ app.add_middleware(
 
 # ─── Cached endpoints (production, fast) ──────────────────
 app.include_router(cached.router, prefix="/api/v1", tags=["Cached (Production)"])
+
+# ─── AI Chat (Gemini-powered) ─────────────────────────────
+app.include_router(chat.router, prefix="/api/chat", tags=["AI Chat"])
 
 # ─── Agent pipeline (live, on-demand) ─────────────────────
 app.include_router(agents.router, prefix="/api/agents", tags=["Multi-Agent Pipeline"])

@@ -5,6 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
+import ThemeToggle from "@/components/ThemeToggle";
 import MapDashboard from "@/components/MapDashboard";
 import ForecastPanel from "@/components/ForecastPanel";
 import AttributionPanel from "@/components/AttributionPanel";
@@ -66,63 +67,12 @@ export default function DashboardPage() {
   // ═══════════════════════════════════════════
   if (!isAuthority) {
     return (
-      <div className="app-bg min-h-screen">
-        <header className="glass border-b sticky top-0 z-30">
-          <div className="max-w-4xl mx-auto flex items-center justify-between px-6 h-16">
-            <div className="flex items-center gap-3">
-              <div
-                className="flex items-center justify-center w-9 h-9 rounded-xl"
-                style={{
-                  background: "linear-gradient(135deg, #06b6d4, #3b82f6)",
-                }}
-              >
-                <span className="text-white font-bold text-sm">A</span>
-              </div>
-              <div>
-                <h1 className="text-base font-bold leading-tight">AERIS</h1>
-                <p className="text-[10px] text-muted">
-                  Your Air Quality Companion
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setAssistantOpen(true)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-white transition-all hover:scale-105"
-                style={{
-                  background: "linear-gradient(135deg, #06b6d4, #3b82f6)",
-                }}
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
-                </span>
-                Ask AI
-              </button>
-
-              <button
-                onClick={() => signOut({ callbackUrl: "/login" })}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl surface-subtle text-xs text-secondary hover:text-[var(--text-primary)] transition-colors"
-              >
-                {session?.user?.name?.split(" ")[0] || "User"}
-                <span className="text-muted">·</span>
-                <span className="text-rose-400">Sign out</span>
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <main className="max-w-4xl mx-auto p-6">
-          <CitizenDashboard />
-        </main>
-
-        <AIAssistant
-          open={assistantOpen}
-          onClose={() => setAssistantOpen(false)}
-          context={{ view: "advisory", station: null }}
-        />
-      </div>
+      <CitizenLayout
+        onOpenAssistant={() => setAssistantOpen(true)}
+        session={session}
+        assistantOpen={assistantOpen}
+        onCloseAssistant={() => setAssistantOpen(false)}
+      />
     );
   }
 
@@ -185,11 +135,7 @@ export default function DashboardPage() {
       {!assistantOpen && (
         <button
           onClick={() => setAssistantOpen(true)}
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 pl-4 pr-5 py-3.5 rounded-2xl text-white font-medium shadow-2xl transition-all duration-300 hover:scale-105 animate-float"
-          style={{
-            background: "linear-gradient(135deg, #06b6d4, #3b82f6)",
-            boxShadow: "0 10px 40px rgba(8, 145, 178, 0.5)",
-          }}
+          className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 pl-4 pr-5 py-3.5 rounded-2xl text-white font-medium shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105 animate-float bg-[var(--accent)]"
         >
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
@@ -198,6 +144,74 @@ export default function DashboardPage() {
           Ask AERIS AI
         </button>
       )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// Citizen Layout with theme toggle
+// ═══════════════════════════════════════════
+function CitizenLayout({
+  onOpenAssistant,
+  session,
+  assistantOpen,
+  onCloseAssistant,
+}: {
+  onOpenAssistant: () => void;
+  session: any;
+  assistantOpen: boolean;
+  onCloseAssistant: () => void;
+}) {
+  return (
+    <div className="app-bg min-h-screen">
+      <header className="glass border-b sticky top-0 z-30">
+        <div className="max-w-4xl mx-auto flex items-center justify-between px-6 h-14">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--accent)]">
+              <span className="text-white font-bold text-xs">A</span>
+            </div>
+            <div>
+              <h1 className="text-sm font-bold leading-tight">AERIS</h1>
+              <p className="text-[10px] text-muted">Your Air Quality Companion</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Theme toggle — same component as everywhere */}
+            <ThemeToggle />
+
+            {/* AI button */}
+            <button
+              onClick={onOpenAssistant}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-white bg-[var(--accent)] transition-all hover:bg-[var(--accent-hover)]"
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+              </span>
+              Ask AI
+            </button>
+
+            {/* Sign out */}
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="px-3 py-2 rounded-lg surface-subtle text-xs text-secondary hover:text-[var(--text-primary)] transition-colors"
+            >
+              {session?.user?.name?.split(" ")[0] || "User"} · <span className="text-rose-400">Sign out</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto p-6">
+        <CitizenDashboard />
+      </main>
+
+      <AIAssistant
+        open={assistantOpen}
+        onClose={onCloseAssistant}
+        context={{ view: "advisory", station: null }}
+      />
     </div>
   );
 }

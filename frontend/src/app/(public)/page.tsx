@@ -36,13 +36,6 @@ const features = [
   },
 ];
 
-const stats = [
-  { value: "94", label: "Monitoring Stations" },
-  { value: "72", label: "ML Features" },
-  { value: "3-Day", label: "Forecast Window" },
-  { value: "2", label: "Languages" },
-];
-
 export default function LandingPage() {
   return (
     <div className="min-h-screen app-bg flex flex-col">
@@ -131,20 +124,8 @@ export default function LandingPage() {
           ))}
         </div>
 
-        {/* Stats strip */}
-        <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 mt-12 mb-8">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center">
-              <p className="text-2xl sm:text-3xl font-bold gradient-text">
-                {s.value}
-              </p>
-              <p className="text-xs text-muted mt-0.5">{s.label}</p>
-            </div>
-          ))}
-        </div>
-
         {/* Data sources */}
-        <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-muted pb-8">
+        <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-muted mt-12 pb-8">
           <span className="flex items-center gap-1.5">
             <MapPin size={11} /> OpenAQ
           </span>

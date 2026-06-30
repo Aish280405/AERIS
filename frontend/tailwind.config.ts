@@ -32,12 +32,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "-apple-system", "sans-serif"],
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-out",
         "slide-up": "slideUp 0.35s ease-out",
-        "slide-in-right": "slideInRight 0.3s ease-out",
         shimmer: "shimmer 2s linear infinite",
         float: "float 6s ease-in-out infinite",
       },
@@ -49,10 +48,6 @@ const config: Config = {
         slideUp: {
           "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        slideInRight: {
-          "0%": { opacity: "0", transform: "translateX(16px)" },
-          "100%": { opacity: "1", transform: "translateX(0)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },

@@ -18,7 +18,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from routers import stations, forecast, attribution, enforcement, advisory, agents
-from routers import cached, chat
+from routers import cached, chat, live
+from routers.live import start_slow_fill
 from cache import get_cache
 from scheduler import get_scheduler
 
@@ -38,6 +39,9 @@ async def lifespan(app: FastAPI):
 
     # Start background scheduler (every 6 hours)
     scheduler.start_background(interval_seconds=21600)
+
+    # Start slow background fill of all India stations from OpenAQ
+    start_slow_fill()
 
     yield  # App runs
 
@@ -67,6 +71,9 @@ app.include_router(cached.router, prefix="/api/v1", tags=["Cached (Production)"]
 
 # ─── AI Chat (Gemini-powered) ─────────────────────────────
 app.include_router(chat.router, prefix="/api/chat", tags=["AI Chat"])
+
+# ─── Live AQI (OpenAQ) ────────────────────────────────────
+app.include_router(live.router, prefix="/api/live", tags=["Live AQI"])
 
 # ─── Agent pipeline (live, on-demand) ─────────────────────
 app.include_router(agents.router, prefix="/api/agents", tags=["Multi-Agent Pipeline"])

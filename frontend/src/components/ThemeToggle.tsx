@@ -7,14 +7,15 @@ interface ThemeToggleProps {
   size?: number;
 }
 
-export default function ThemeToggle({ size = 16 }: ThemeToggleProps) {
+export default function ThemeToggle({ size = 15 }: ThemeToggleProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (
     <button
       onClick={toggleTheme}
-      className="relative flex items-center justify-center w-9 h-9 rounded-lg surface-subtle transition-colors overflow-hidden"
+      className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-[var(--border-strong)] bg-[var(--bg-subtle)] hover:bg-[var(--bg-inset)] transition-all duration-200 overflow-hidden"
       title={theme === "dark" ? "Switch to light" : "Switch to dark"}
+      aria-label="Toggle theme"
     >
       <Sun
         size={size}
@@ -26,7 +27,7 @@ export default function ThemeToggle({ size = 16 }: ThemeToggleProps) {
       />
       <Moon
         size={size}
-        className={`absolute text-brand-300 transition-all duration-300 ${
+        className={`absolute text-[var(--accent)] transition-all duration-300 ${
           theme === "dark"
             ? "opacity-100 rotate-0 scale-100"
             : "opacity-0 -rotate-90 scale-0"

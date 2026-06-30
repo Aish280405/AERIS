@@ -1,143 +1,155 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Wind,
-  BarChart3,
-  PieChart,
-  Shield,
-  HeartPulse,
-  MapPin,
-  Brain,
-  Globe,
-  ArrowRight,
-  Zap,
-} from "lucide-react";
+import dynamic from "next/dynamic";
+import { motion, Variants } from "framer-motion";
+import { Wind, ArrowRight } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
-const features = [
-  {
-    icon: <BarChart3 size={20} />,
-    title: "Predictive Forecasting",
-    desc: "1–3 day AQI predictions at ~5km resolution using ML models trained on 72 features",
-  },
-  {
-    icon: <PieChart size={20} />,
-    title: "Source Attribution",
-    desc: "SHAP-powered breakdown — traffic, industrial, fires, weather — with confidence scores",
-  },
-  {
-    icon: <Shield size={20} />,
-    title: "Enforcement Intelligence",
-    desc: "Prioritized, evidence-backed recommendations for inspector deployment",
-  },
-  {
-    icon: <HeartPulse size={20} />,
-    title: "Health Advisories",
-    desc: "LLM-generated personalized alerts in Hindi & English based on your area",
-  },
-];
+const IndiaGlobe = dynamic(() => import("@/components/IndiaGlobe"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[var(--accent)]/30 border-t-[var(--accent)] rounded-full animate-spin" />
+    </div>
+  ),
+});
 
+// ─── Animation variants ──────────────────────────────
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.25, 0.4, 0.25, 1] },
+  }),
+};
+
+const stagger: Variants = {
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+// ─── Component ───────────────────────────────────────
 export default function LandingPage() {
   return (
-    <div className="min-h-screen app-bg flex flex-col">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-6 sm:px-12 py-5 max-w-7xl mx-auto w-full">
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--accent)]">
-            <Wind size={18} className="text-white" />
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] overflow-x-hidden">
+      {/* ═══ Background effects ═══ */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Grid */}
+        <div
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.04]"
+          style={{
+            backgroundImage: `linear-gradient(var(--border-strong) 1px, transparent 1px), linear-gradient(90deg, var(--border-strong) 1px, transparent 1px)`,
+            backgroundSize: "64px 64px",
+          }}
+        />
+        {/* Radial glow */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-[var(--accent)] opacity-[0.04] blur-[150px]" />
+        <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] rounded-full bg-[var(--secondary)] opacity-[0.03] blur-[150px]" />
+      </div>
+
+      {/* ═══ Navbar ═══ */}
+      <nav className="sticky top-0 z-50 glass">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 h-16">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[var(--accent)] flex items-center justify-center">
+              <Wind size={16} className="text-white" />
+            </div>
+            <span className="font-bold text-base tracking-tight">AERIS</span>
           </div>
-          <span className="text-lg font-bold tracking-tight">AERIS</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <Link
-            href="/login"
-            className="px-4 py-2 rounded-lg text-sm font-medium text-secondary hover:text-[var(--text-primary)] transition-colors"
-          >
-            Sign In
-          </Link>
-          <Link href="/signup" className="btn-primary">
-            Get Started
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link href="/login" className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text)] transition-colors">
+              Sign In
+            </Link>
+            <Link href="/signup" className="btn-primary">
+              Get Started
+            </Link>
+          </div>
         </div>
       </nav>
 
-      {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 text-center max-w-7xl mx-auto w-full">
-        <div className="max-w-2xl mx-auto space-y-6 py-16">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full surface-subtle text-xs font-medium text-secondary">
-            <Zap size={12} className="text-[var(--accent)]" />
-            Multi-Agent AI System • Real-time Intelligence
-          </div>
+      {/* ═══ Hero ═══ */}
+      <section className="relative min-h-[calc(100vh-64px)] flex items-center">
+        <div className="max-w-6xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 py-20">
+          {/* Left */}
+          <motion.div
+            className="flex flex-col justify-center max-w-[560px]"
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
+          >
+            <motion.div custom={0} variants={fadeUp}>
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--bg-subtle)] text-xs font-medium text-[var(--text-muted)] mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+                Multi-Agent AI · Real-time Intelligence
+              </span>
+            </motion.div>
 
-          {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.15]">
-            Air quality intelligence{" "}
-            <span className="gradient-text">that acts,</span>{" "}
-            not just monitors
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-base sm:text-lg text-secondary max-w-lg mx-auto leading-relaxed">
-            AERIS fuses monitoring data, satellite imagery, and ML to give Indian cities the tools to reduce pollution at source — not just measure it.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex items-center justify-center gap-3 pt-4">
-            <Link
-              href="/signup"
-              className="btn-primary px-6 py-3 flex items-center gap-2"
+            <motion.h1
+              custom={1}
+              variants={fadeUp}
+              className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.12] mb-6"
             >
-              Get Started <ArrowRight size={15} />
-            </Link>
-            <Link
-              href="/login"
-              className="px-6 py-3 rounded-xl text-sm font-medium surface text-secondary hover:text-[var(--text-primary)] transition-colors"
-            >
-              Sign In
-            </Link>
-          </div>
-        </div>
+              Air quality intelligence{" "}
+              <span className="gradient-text">that acts,</span> not just monitors
+            </motion.h1>
 
-        {/* Features */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-5xl pb-8">
-          {features.map((f, i) => (
-            <div
-              key={f.title}
-              className="card !p-5 text-left animate-slide-up"
-              style={{ animationDelay: `${i * 60}ms` }}
+            <motion.p
+              custom={2}
+              variants={fadeUp}
+              className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed mb-8 max-w-[480px]"
             >
-              <div
-                className="flex items-center justify-center w-9 h-9 rounded-lg mb-3"
-                style={{ background: "var(--accent-soft)", color: "var(--accent)" }}
+              AERIS fuses monitoring data, satellite imagery, and ML to give Indian cities the tools to reduce pollution at source — not just measure it.
+            </motion.p>
+
+            <motion.div custom={3} variants={fadeUp} className="flex items-center gap-3">
+              <Link href="/signup" className="btn-primary flex items-center gap-2 px-6 py-3">
+                Get Started <ArrowRight size={15} />
+              </Link>
+              <Link
+                href="/login"
+                className="px-6 py-3 rounded-xl text-sm font-medium border border-[var(--border-strong)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[var(--text-muted)] transition-all"
               >
-                {f.icon}
-              </div>
-              <h3 className="text-sm font-semibold mb-1.5">{f.title}</h3>
-              <p className="text-xs text-secondary leading-relaxed">{f.desc}</p>
-            </div>
-          ))}
-        </div>
+                Sign In
+              </Link>
+            </motion.div>
 
-        {/* Data sources */}
-        <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-muted mt-8 pb-10">
-          <span className="flex items-center gap-1.5">
-            <MapPin size={11} /> OpenAQ
-          </span>
-          <span className="opacity-30">•</span>
-          <span className="flex items-center gap-1.5">
-            <Globe size={11} /> Open-Meteo
-          </span>
-          <span className="opacity-30">•</span>
-          <span>NASA FIRMS</span>
-          <span className="opacity-30">•</span>
-          <span>OpenStreetMap</span>
-          <span className="opacity-30">•</span>
-          <span>CPCB Network</span>
+            {/* Trust signals */}
+            <motion.div custom={4} variants={fadeUp} className="flex items-center gap-6 mt-12 text-xs text-[var(--text-muted)]">
+              <span>OpenAQ</span>
+              <span className="opacity-30">·</span>
+              <span>NASA FIRMS</span>
+              <span className="opacity-30">·</span>
+              <span>CPCB Network</span>
+              <span className="opacity-30">·</span>
+              <span>Open-Meteo</span>
+            </motion.div>
+          </motion.div>
+
+          {/* Right — Globe */}
+          <motion.div
+            className="relative flex items-center justify-center lg:justify-end"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
+          >
+            <IndiaGlobe />
+          </motion.div>
         </div>
-      </main>
+      </section>
+
+      {/* ═══ Footer ═══ */}
+      <footer className="border-t border-[var(--border)] py-8">
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-xs text-[var(--text-muted)]">
+          <div className="flex items-center gap-2">
+            <Wind size={14} className="text-[var(--accent)]" />
+            <span className="font-medium text-[var(--text)]">AERIS</span>
+            <span>· Urban AQI Intelligence</span>
+          </div>
+          <span>Built for India&apos;s air quality challenge</span>
+        </div>
+      </footer>
     </div>
   );
 }

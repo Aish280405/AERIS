@@ -12,6 +12,8 @@
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.3",
+    "framer-motion": "^12.42.0",
+    "globe.gl": "^2.46.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.395.0",
     "next": "^14.2.4",
@@ -19,7 +21,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-leaflet": "^4.2.1",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "three": "^0.185.0"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.12",

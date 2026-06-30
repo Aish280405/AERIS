@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { stations } from "@/lib/data";
 import {
   getAqiColor,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/lib/language";
 import { translations } from "@/lib/i18n";
+import { fetchSnapshot, StationSnapshot } from "@/lib/api";
 
 // ─── Advisories ─────────────────────────────────────
 type Lang = "en" | "hi";
@@ -109,15 +110,41 @@ export default function CitizenDashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const station = stations.find((s) => s.station_id === selectedStationId)!;
-  const aqi = mockAqiForStation(selectedStationId);
+  const [snapshot, setSnapshot] = useState<StationSnapshot | null>(null);
+
+  useEffect(() => {
+    fetchSnapshot(selectedStationId).then((data) => setSnapshot(data));
+  }, [selectedStationId]);
+
+  // Use real data if available, fallback to mock
+  const aqi = snapshot ? snapshot.current_aqi : mockAqiForStation(selectedStationId);
   const category = getAqiCategory(aqi);
   const color = getAqiColor(category);
   const localCategory = strings.categories[category] || category;
   const localDescription = strings.descriptions[category] || "";
-  const forecast = useMemo(
-    () => buildForecast(selectedStationId, language),
-    [selectedStationId, language]
-  );
+
+  // Use real forecast from snapshot if available
+  const forecast = useMemo(() => {
+    if (snapshot?.forecast?.predictions?.length) {
+      const locale = language === "hi" ? "hi-IN" : "en-IN";
+      return snapshot.forecast.predictions.map((p) => {
+        const predAqi = p.predicted_aqi;
+        return {
+          day: p.day_ahead,
+          label: new Date(Date.now() + p.day_ahead * 86400000).toLocaleDateString(locale, {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+          }),
+          aqi: predAqi,
+          category: getAqiCategory(predAqi),
+          color: getAqiColor(getAqiCategory(predAqi)),
+          trend: predAqi > aqi + 30 ? ("up" as const) : predAqi < aqi - 30 ? ("down" as const) : ("stable" as const),
+        };
+      });
+    }
+    return buildForecast(selectedStationId, language);
+  }, [selectedStationId, language, snapshot, aqi]);
   const advisory = advisories[language][category];
 
   return (

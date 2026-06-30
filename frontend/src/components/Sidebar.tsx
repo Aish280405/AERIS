@@ -142,10 +142,10 @@ export default function Sidebar({
           {!collapsed && (
             <div className="overflow-hidden">
               <p className="text-xs font-medium whitespace-nowrap">
-                Delhi · 30 stations
+                India · Live
               </p>
               <p className="text-[10px] text-muted whitespace-nowrap">
-                Live · updated now
+                OpenAQ · updated hourly
               </p>
             </div>
           )}

@@ -1,70 +1,43 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Shield, AlertTriangle, MapPin, TrendingDown, Clock } from "lucide-react";
+import { fetchEnforcement, EnforcementRec } from "@/lib/api";
 
-const recommendations = [
-  {
-    rank: 1,
-    area: "Anand Vihar",
-    predicted_aqi: 468,
-    urgency: "critical",
-    primary_source: "Vehicular + Industrial",
-    action: "Deploy mobile inspection unit for industrial emissions check",
-    evidence: "Forecast shows 45% AQI increase in next 24h",
-    impact: "Could reduce AQI by 25% if acted within 6h",
-  },
-  {
-    rank: 2,
-    area: "Wazirpur",
-    predicted_aqi: 412,
-    urgency: "critical",
-    primary_source: "Industrial",
-    action: "Inspect industrial units for emission compliance",
-    evidence: "Industrial contribution spiked 30% above baseline",
-    impact: "Could reduce AQI by 20% if acted within 12h",
-  },
-  {
-    rank: 3,
-    area: "Jahangirpuri",
-    predicted_aqi: 356,
-    urgency: "high",
-    primary_source: "Construction Dust",
-    action: "Inspect construction sites for dust suppression compliance",
-    evidence: "Construction dust at 22% — above threshold",
-    impact: "Could reduce AQI by 15% with proper dust control",
-  },
-  {
-    rank: 4,
-    area: "Rohini",
-    predicted_aqi: 310,
-    urgency: "high",
-    primary_source: "Biomass Burning",
-    action: "Monitor biomass burning — satellite hotspot detected",
-    evidence: "NASA FIRMS shows 3 active fire hotspots within 5km",
-    impact: "Could reduce AQI by 18% if burning stopped",
-  },
-  {
-    rank: 5,
-    area: "Dwarka Sector 8",
-    predicted_aqi: 285,
-    urgency: "medium",
-    primary_source: "Vehicular Traffic",
-    action: "Set up traffic diversion — high vehicular pollution",
-    evidence: "Road density drives 40% of PM2.5 here",
-    impact: "Could reduce AQI by 12% with traffic management",
-  },
-];
+const urgencyStyle: Record<string, { text: string; bg: string }> = {
+  critical: { text: "#ef4444", bg: "rgba(239,68,68,0.1)" },
+  high: { text: "#f97316", bg: "rgba(249,115,22,0.1)" },
+  medium: { text: "#eab308", bg: "rgba(234,179,8,0.1)" },
+};
 
-const urgencyStyle: Record<string, { text: string; bg: string; border: string }> = {
-  critical: { text: "#ef4444", bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.3)" },
-  high: { text: "#f97316", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.3)" },
-  medium: { text: "#eab308", bg: "rgba(234,179,8,0.12)", border: "rgba(234,179,8,0.3)" },
+const sourceLabels: Record<string, string> = {
+  vehicular_traffic: "Vehicular Traffic",
+  industrial: "Industrial",
+  construction: "Construction",
+  biomass_burning: "Biomass Burning",
+  weather_driven: "Weather-driven",
 };
 
 export default function EnforcementPanel() {
-  const criticalCount = recommendations.filter(
-    (r) => r.urgency === "critical"
-  ).length;
+  const [recs, setRecs] = useState<EnforcementRec[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchEnforcement().then((data) => {
+      setRecs(data || []);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="card h-64 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-[var(--accent)]/30 border-t-[var(--accent)] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const criticalCount = recs.filter((r) => r.urgency === "critical").length;
 
   return (
     <div className="h-full flex flex-col gap-5 animate-fade-in">
@@ -72,41 +45,30 @@ export default function EnforcementPanel() {
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="card !p-4">
           <p className="text-xs text-muted mb-1">Total Recommendations</p>
-          <p className="text-3xl font-bold">{recommendations.length}</p>
+          <p className="text-3xl font-bold">{recs.length}</p>
         </div>
         <div className="card !p-4">
           <p className="text-xs text-muted mb-1">Critical Priority</p>
           <p className="text-3xl font-bold text-rose-500">{criticalCount}</p>
         </div>
         <div className="card !p-4 col-span-2 lg:col-span-1">
-          <p className="text-xs text-muted mb-1">Generated</p>
-          <p className="text-sm font-medium mt-2 flex items-center gap-1.5">
-            <Clock size={14} className="text-brand-400" />
-            {new Date().toLocaleTimeString("en-IN", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}{" "}
-            · today
+          <p className="text-xs text-muted mb-1">Source</p>
+          <p className="text-sm font-medium mt-2 flex items-center gap-1.5 text-[var(--accent)]">
+            <Clock size={14} />
+            {recs.length > 0 ? "Live from model" : "No data"}
           </p>
         </div>
       </div>
 
       {/* List */}
       <div className="space-y-3">
-        {recommendations.map((rec, i) => {
-          const u = urgencyStyle[rec.urgency];
+        {recs.map((rec, i) => {
+          const u = urgencyStyle[rec.urgency] || urgencyStyle.medium;
           return (
-            <div
-              key={rec.rank}
-              className="card !p-5 animate-slide-up"
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
+            <div key={rec.rank} className="card !p-5 animate-slide-up" style={{ animationDelay: `${i * 60}ms` }}>
               <div className="flex items-start justify-between gap-4 mb-3">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="flex items-center justify-center w-9 h-9 rounded-xl text-sm font-bold text-white shrink-0"
-                    style={{ background: "linear-gradient(135deg, #06b6d4, #3b82f6)" }}
-                  >
+                  <div className="flex items-center justify-center w-9 h-9 rounded-xl text-sm font-bold text-white shrink-0 bg-[var(--accent)]">
                     {rec.rank}
                   </div>
                   <div>
@@ -115,14 +77,14 @@ export default function EnforcementPanel() {
                       <span className="font-semibold">{rec.area}</span>
                     </div>
                     <span className="text-[11px] text-muted">
-                      Primary: {rec.primary_source}
+                      {sourceLabels[rec.primary_source] || rec.primary_source} ({rec.source_contribution}%)
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <span
-                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide border"
-                    style={{ color: u.text, background: u.bg, borderColor: u.border }}
+                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide"
+                    style={{ color: u.text, background: u.bg }}
                   >
                     {rec.urgency}
                   </span>
@@ -130,15 +92,15 @@ export default function EnforcementPanel() {
                     <p className="text-2xl font-bold leading-none" style={{ color: u.text }}>
                       {rec.predicted_aqi}
                     </p>
-                    <p className="text-[10px] text-muted">pred. AQI</p>
+                    <p className="text-[10px] text-muted">AQI</p>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2 pl-12">
                 <div className="flex items-start gap-2 text-sm">
-                  <Shield size={14} className="text-brand-400 mt-0.5 shrink-0" />
-                  <span>{rec.action}</span>
+                  <Shield size={14} className="text-[var(--accent)] mt-0.5 shrink-0" />
+                  <span>{rec.recommended_action}</span>
                 </div>
                 <div className="flex items-start gap-2 text-sm text-secondary">
                   <AlertTriangle size={14} className="text-amber-500 mt-0.5 shrink-0" />
@@ -146,13 +108,19 @@ export default function EnforcementPanel() {
                 </div>
                 <div className="flex items-start gap-2 text-sm text-emerald-500">
                   <TrendingDown size={14} className="mt-0.5 shrink-0" />
-                  <span>{rec.impact}</span>
+                  <span>{rec.estimated_impact}</span>
                 </div>
               </div>
             </div>
           );
         })}
       </div>
+
+      {recs.length === 0 && (
+        <div className="card !p-5 text-center text-muted">
+          No enforcement data. Start the backend API to see live recommendations.
+        </div>
+      )}
     </div>
   );
 }

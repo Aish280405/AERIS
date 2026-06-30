@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { HeartPulse, Wind, ShieldCheck, Languages } from "lucide-react";
-import { stations } from "@/lib/data";
+import { useStations } from "@/lib/data";
 import { getAqiColor, getAqiCategory, mockAqiForStation } from "@/lib/aqi";
 
 interface AdvisoryPanelProps {
@@ -57,6 +57,7 @@ const advisories: Record<
 
 export default function AdvisoryPanel({ stationId }: AdvisoryPanelProps) {
   const [language, setLanguage] = useState<"en" | "hi">("en");
+  const stations = useStations();
   const station = stations.find((s) => s.station_id === stationId);
 
   const aqi = stationId ? mockAqiForStation(stationId) : 280;

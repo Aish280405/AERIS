@@ -19,27 +19,33 @@ from pathlib import Path
 
 MODEL_DIR = Path(__file__).parent.parent / "models"
 
-# Feature groups that map to each pollution source
+# Feature groups that map to each pollution source (matching ml_dataset_cleaned.csv)
 SOURCE_FEATURE_GROUPS = {
     "vehicular_traffic": [
-        "road_density_500m", "highway_km_1km", "road_density_1km",
+        "road_density_km", "highway_km",
     ],
     "industrial": [
-        "industrial_count_2km", "industrial_count_5km",
+        "industrial_count",
     ],
     "construction": [
-        "construction_count_2km",
+        "construction_count",
     ],
     "biomass_burning": [
-        "fire_count", "fire_count_lag1", "fire_count_rolling7d",
-        "fire_dispersion_index",
+        "fire_count", "fire_count_lag_1", "fire_count_roll_7",
+        "fire_dispersion_index", "fire_wind_interaction",
+        "fire_trend", "frp_sum", "frp_sum_lag_1", "frp_sum_roll_7",
     ],
     "weather_driven": [
-        "wind_speed", "temperature_2m", "relative_humidity_2m",
-        "inversion_proxy", "wind_stagnation_index", "calm_wind_indicator",
+        "wind_speed_mean", "wind_speed_max", "wind_speed_mean_roll_7",
+        "temp_mean", "temp_max", "temp_min", "temp_range",
+        "humidity_mean", "humidity_mean_roll_7",
+        "inversion_proxy", "stagnation_index", "is_low_wind", "is_rain",
+        "precip_sum", "precip_roll_sum_3", "precip_roll_sum_7",
     ],
     "secondary_particles": [
-        "no2", "o3", "no2_lag1", "o3_lag1",
+        "pm25_lag_1", "pm25_lag_2", "pm25_lag_3", "pm25_lag_7",
+        "pm25_roll_mean_3", "pm25_roll_mean_7",
+        "pm25_roll_std_3", "pm25_roll_std_7",
     ],
 }
 
@@ -110,18 +116,27 @@ class SourceAttributionAgent:
     def _heuristic_attribution(self, features: Dict) -> Dict[str, float]:
         """
         When features are available but no SHAP explainer,
-        use feature magnitudes as a rough proxy for attribution.
+        use normalized feature magnitudes as a proxy for attribution.
+        Normalizes by group size to prevent groups with many features from dominating.
         """
         source_scores = {}
         for source, source_features in SOURCE_FEATURE_GROUPS.items():
             score = 0.0
+            count = 0
             for fname in source_features:
                 val = features.get(fname, 0)
                 if isinstance(val, (int, float)):
                     score += abs(val)
-            source_scores[source] = max(score, 0.01)  # avoid zero
+                    count += 1
+            # Normalize by number of features in the group (average magnitude)
+            if count > 0:
+                source_scores[source] = score / count
+            else:
+                source_scores[source] = 0.01
 
         total = sum(source_scores.values())
+        if total == 0:
+            return self._mock_attribution(features)
         return {k: round(v / total * 100, 1) for k, v in source_scores.items()}
 
     def _mock_attribution(self, features: Dict) -> Dict[str, float]:

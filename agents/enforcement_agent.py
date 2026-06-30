@@ -135,7 +135,16 @@ class EnforcementAgent:
             score = aqi * 0.6 + actionable_pct * 2.0
             
             dominant = ctx.get("dominant_source", "vehicular_traffic")
-            dominant_pct = attribution.get(dominant, 30)
+            # Use top actionable source (not weather_driven or secondary)
+            actionable_sources = {
+                k: v for k, v in attribution.items()
+                if k in ACTION_TEMPLATES
+            }
+            if actionable_sources:
+                dominant = max(actionable_sources, key=actionable_sources.get)
+                dominant_pct = actionable_sources[dominant]
+            else:
+                dominant_pct = attribution.get(dominant, 30)
             
             actions = ACTION_TEMPLATES.get(dominant, ["Investigate"])
             action = actions[0]

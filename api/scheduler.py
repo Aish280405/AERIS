@@ -45,7 +45,7 @@ class PrecomputeScheduler:
         self._thread = None
 
     def _load_stations(self) -> List[Dict]:
-        """Load station data."""
+        """Load station data from stations.json (auto-generated from ML dataset)."""
         stations_file = Path(__file__).parent.parent / "data" / "stations.json"
         if stations_file.exists():
             with open(stations_file) as f:
@@ -68,12 +68,18 @@ class PrecomputeScheduler:
         return count
 
     def precompute_attribution(self) -> int:
-        """Run attribution for all stations, write to cache."""
+        """Run attribution for all stations using real features, write to cache."""
         count = 0
         for station in self.stations:
             sid = station["station_id"]
             try:
-                result = self.attribution_agent.attribute({})
+                # Get real features for this station from the forecast agent's cache
+                numeric_id = int(sid) if sid.isdigit() else None
+                features = {}
+                if numeric_id and numeric_id in self.forecast_agent._station_features:
+                    features = self.forecast_agent._station_features[numeric_id]
+
+                result = self.attribution_agent.attribute(features)
                 self.cache.set_namespaced("attribution", sid, result, CacheTTL.ATTRIBUTION)
                 count += 1
             except Exception as e:

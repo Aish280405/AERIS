@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Send, Sparkles, Bot, User } from "lucide-react";
 import type { View } from "@/lib/types";
-import { stations } from "@/lib/data";
+import { useStations, stations } from "@/lib/data";
 import { useLanguage } from "@/lib/language";
 import { useSession } from "next-auth/react";
 

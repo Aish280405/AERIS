@@ -27,8 +27,8 @@ AERIS provides that layer: geospatial source attribution, predictive forecasting
 AERIS/
 ├── agents/                  ← Multi-agent AI system
 │   ├── orchestrator.py      ← Chains all agents together
-│   ├── forecast_agent.py    ← ML-based AQI prediction (1-3 days)
-│   ├── attribution_agent.py ← SHAP source attribution
+│   ├── forecast_agent.py    ← XGBoost PM2.5 prediction (uses xgb_day1.joblib)
+│   ├── attribution_agent.py ← Feature-group heuristic source attribution
 │   ├── enforcement_agent.py ← Prioritized action recommendations
 │   ├── advisory_agent.py    ← LLM-generated health advisories (Gemini)
 │   └── agent_arch.md        ← Agent architecture documentation
@@ -36,18 +36,28 @@ AERIS/
 │   ├── main.py              ← App entry + startup precomputation
 │   ├── cache.py             ← Redis cache layer (with in-memory fallback)
 │   ├── scheduler.py         ← Background precomputation engine
+│   ├── .env                 ← API keys (GEMINI_API_KEY, OPENAQ_API_KEY, REDIS_URL)
 │   └── routers/
 │       ├── cached.py        ← Production endpoints (serve from Redis)
+│       ├── live.py          ← Live AQI from OpenAQ with dataset fallback
+│       ├── stations.py      ← Station metadata (from data/stations.json)
+│       ├── chat.py          ← AI chat (Gemini-powered)
 │       ├── agents.py        ← Live agent pipeline endpoints
-│       ├── stations.py      ← Station metadata
 │       └── ...
 ├── frontend/                ← Next.js web dashboard
 │   └── src/
 │       ├── app/             ← Pages (landing, login, signup, dashboard)
 │       ├── components/      ← Map, panels, AI assistant, citizen dashboard
-│       └── lib/             ← Auth, theme, utilities
-├── models/                  ← Trained .joblib files (added after training)
-├── data/                    ← Station coordinates (30 Delhi stations)
+│       └── lib/
+│           ├── data.ts      ← Station list (auto-generated from data/stations.json)
+│           ├── api.ts       ← API client functions
+│           ├── aqi.ts       ← AQI calculation utilities
+│           └── ...
+├── models/
+│   └── xgb_day1.joblib     ← Trained XGBoost model (61 features, Delhi)
+├── data/
+│   ├── stations.json        ← 88 station definitions (ID, name, lat/lon)
+│   └── ml_dataset_cleaned.csv ← Training dataset (36K rows, 68 cols, 88 stations)
 └── docs/
     └── system_design.md     ← Full system design document
 ```
@@ -79,12 +89,62 @@ AERIS uses a **precompute + Redis cache** architecture:
 | Scales linearly with users | Fixed compute cost |
 | LLM call per user | 180 precomputed variants |
 
-The scheduler precomputes **271 cache entries** on startup:
-- 30 station forecasts
-- 30 station attributions
-- 10 enforcement recommendations
-- 180 LLM advisory variants (all AQI bucket × source × language × trend combinations)
-- 30 station snapshots (aggregate endpoint)
+The scheduler precomputes on startup:
+- 88 station forecasts (XGBoost model with real features from dataset)
+- 88 station attributions (feature-group heuristic per station)
+- 10 enforcement recommendations (ranked by priority score)
+- LLM advisory variants (all AQI bucket × source × language × trend combinations)
+- 88 station snapshots (aggregate endpoint)
+
+---
+
+## Live AQI Data
+
+The map shows real-time AQI from two sources:
+
+| Source | When used | Stations | Cache TTL |
+|--------|-----------|----------|-----------|
+| OpenAQ v3 API | When API key is valid & not rate-limited | 600+ across India | 6 hours |
+| Dataset fallback (`ml_dataset_cleaned.csv`) | When OpenAQ is unavailable | 88 Delhi stations | 12 hours |
+
+The system **never shows an empty map**. If OpenAQ is down, rate-limited, or the key is invalid, it falls back to the latest values from your ML dataset.
+
+### OpenAQ Integration
+
+- Auth: `X-API-Key` header
+- India country ID: `9`
+- Rate limits: ~60 req/min (free tier) — system uses conservative batching (5 concurrent, 12s gaps)
+- Background slow-fill: gradually fetches all 600+ Indian stations over ~25 min
+
+### Adding to / Regenerating Station Data
+
+When you add new cities or stations to `ml_dataset_cleaned.csv`:
+
+```bash
+# Regenerate stations.json from the dataset
+python3 -c "
+import json, pandas as pd
+df = pd.read_csv('data/ml_dataset_cleaned.csv')
+stations = df.groupby('station_id').agg({'city':'first','lat':'first','lon':'first'}).reset_index()
+result = [{'station_id':str(int(r.station_id)),'station_name':f'Station {int(r.station_id)}','city':r.city,'lat':round(r.lat,6),'lon':round(r.lon,6),'pollutants':['PM2.5','PM10','NO2']} for _,r in stations.iterrows()]
+json.dump(sorted(result,key=lambda x:x['station_name']),open('data/stations.json','w'),indent=2)
+print(f'Generated {len(result)} stations')
+"
+
+# Then regenerate frontend data.ts
+python3 -c "
+import json
+with open('data/stations.json') as f: stations = json.load(f)
+lines = ['export interface Station {','  station_id: string;','  station_name: string;','  city: string;','  lat: number;','  lon: number;','  pollutants: string[];','}','','export const stations: Station[] = [']
+for s in stations: lines.append(f'  {{ station_id: \"{s[\"station_id\"]}\", station_name: \"{s[\"station_name\"]}\", city: \"{s[\"city\"]}\", lat: {s[\"lat\"]}, lon: {s[\"lon\"]}, pollutants: {json.dumps(s[\"pollutants\"])} }},')
+lines += ['];','','export function useStations(): Station[] { return stations; }','export async function fetchStations(): Promise<Station[]> { return stations; }']
+open('frontend/src/lib/data.ts','w').write('\n'.join(lines))
+print(f'Written {len(stations)} stations to frontend/src/lib/data.ts')
+"
+
+# Refresh backend cache
+curl -X POST http://localhost:8000/api/v1/refresh
+```
 
 See [`docs/system_design.md`](docs/system_design.md) for the complete system design.
 
@@ -283,17 +343,17 @@ You should see:
 
 ### Optional: Add trained models
 
-Once you have trained models (from Kaggle), drop them in:
+The project ships with `models/xgb_day1.joblib` (trained XGBoost, 61 features). For multi-day models or SHAP:
 
 ```bash
-# From project root
-cp ~/Downloads/xgb_1day.joblib models/
-cp ~/Downloads/xgb_2day.joblib models/
-cp ~/Downloads/xgb_3day.joblib models/
+cp ~/Downloads/xgb_day2.joblib models/
+cp ~/Downloads/xgb_day3.joblib models/
 cp ~/Downloads/shap_explainer.joblib models/
 ```
 
-Restart the API — agents auto-detect and use them. No code changes needed.
+Restart the API — agents auto-detect and use them. The forecast agent uses day-1 model for all days if day-2/3 models are missing (with lag-shifted features for variation).
+
+**Important:** `xgboost` must be installed (`pip install xgboost`). The requirements.txt includes it.
 
 ---
 
@@ -351,30 +411,28 @@ Start the API and visit `http://localhost:8000/docs` for Swagger UI.
 
 ## Data Pipeline
 
-Built in a separate repo (`aqi-urban`):
-
-- **64,459 rows** × 28 columns (station × date, Delhi, 2018-2026)
-- **72 engineered features** (lags, rolling stats, wind decomposition, interactions, OSM static features)
-- **94 stations** across Delhi with lat/lon coordinates
+- **36,821 rows** × 68 columns (station × date, Delhi, 2018-2026)
+- **88 monitoring stations** across Delhi with lat/lon coordinates
+- **61 model features** (lags, rolling stats, wind decomposition, fire interactions, land-use from OSM)
+- Station IDs are OpenAQ numeric IDs (e.g., `235` = Anand Vihar)
 - Feature engineering avoids leakage (all rolling stats shifted)
-
-Baseline persistence RMSE = **83.38**. Target: beat this with trained XGBoost/LightGBM.
 
 ---
 
 ## Model Integration
 
-Drop trained models into `/models/` — agents auto-detect on startup:
+The trained model lives at `models/xgb_day1.joblib`:
 
-```
-models/
-├── xgb_1day.joblib         ← Day-1 PM2.5 forecast
-├── xgb_2day.joblib         ← Day-2 PM2.5 forecast
-├── xgb_3day.joblib         ← Day-3 PM2.5 forecast
-└── shap_explainer.joblib   ← SHAP TreeExplainer for attribution
-```
+- **Type:** XGBRegressor
+- **Features:** 61 (from `ml_dataset_cleaned.csv` columns)
+- **Target:** `target_pm25_next_1` (next-day PM2.5)
+- **Stations:** 88 Delhi stations (matched by numeric ID)
 
-No code changes needed. The forecast agent checks for these files on startup.
+The forecast agent:
+1. Loads the model + latest features per station from the CSV
+2. For day 1: feeds real features directly
+3. For day 2-3: shifts lag features forward using the previous prediction
+4. Floors negative predictions to a decay from current PM2.5 (model sometimes undershoots for clean stations)
 
 ---
 
@@ -382,15 +440,15 @@ No code changes needed. The forecast agent checks for these files on startup.
 
 | Feature | Citizen View | Authority View |
 |---------|-------------|---------------|
-| Location picker (DDL) | ✅ | — |
+| Location picker (88 stations) | ✅ | — |
 | Personal AQI + ring gauge | ✅ | — |
-| 3-day forecast cards | ✅ | ✅ (detailed) |
+| 3-day forecast cards (XGBoost) | ✅ | ✅ (detailed) |
 | Health advisory (Hindi/English) | ✅ | ✅ |
 | Pollutant levels | ✅ | ✅ |
-| Map dashboard (30 stations) | — | ✅ |
+| Map dashboard (88+ stations, live) | — | ✅ |
 | Source attribution (donut + bars) | — | ✅ |
 | Enforcement panel (ranked) | — | ✅ |
-| AI Assistant chat | ✅ | ✅ |
+| AI Assistant chat (Gemini) | ✅ | ✅ |
 | Dark/light theme | ✅ | ✅ |
 
 ---

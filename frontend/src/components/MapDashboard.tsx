@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { Activity, AlertTriangle, Gauge, TrendingUp, Search } from "lucide-react";
-import { stations } from "@/lib/data";
+import { useStations } from "@/lib/data";
 import { getAqiColor, getAqiCategory } from "@/lib/aqi";
 import { useTheme } from "@/lib/theme";
 import { fetchLiveCities, LiveCity } from "@/lib/api";
@@ -38,6 +38,7 @@ export default function MapDashboard({
 }: MapDashboardProps) {
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
+  const stations = useStations();
   const [cities, setCities] = useState<LiveCity[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"india" | "delhi">("india");

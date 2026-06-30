@@ -2,17 +2,18 @@
 Live AQI endpoint — fetches real-time AQI from OpenAQ (v3 API).
 Gets all active Indian monitoring stations and their latest readings.
 
-Strategy to handle OpenAQ rate limits (free tier ~60 req/min):
-- Locations list: 1 API call (all 740 stations)
-- Latest readings: fetched in small batches (5 concurrent, 12s gaps)
-- Startup worker gradually fills cache over ~25 min
-- Hourly refresh keeps data fresh
-- Everything cached for 1 hour
+Resilience strategy:
+- Primary: OpenAQ v3 API (live data)
+- Fallback: Latest values from ml_dataset_cleaned.csv (always available)
+- Cache: Redis with 1-hour TTL
+- The map ALWAYS shows data, even if the API is down.
 """
 
 import os
 import asyncio
 import httpx
+import pandas as pd
+from pathlib import Path
 from fastapi import APIRouter, BackgroundTasks
 from typing import List, Dict, Optional
 from dotenv import load_dotenv
@@ -24,19 +25,24 @@ router = APIRouter()
 
 OPENAQ_API_KEY = os.environ.get("OPENAQ_API_KEY", "")
 OPENAQ_BASE = "https://api.openaq.org/v3"
+DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
 # India's country ID in OpenAQ
 INDIA_COUNTRY_ID = 9
 
-# Rate-limit safe settings for FAST initial fetch (gets ~60 stations quickly)
+# Rate-limit safe settings for FAST initial fetch
 FAST_BATCH_SIZE = 5
 FAST_BATCH_DELAY = 2.0
 
-# Rate-limit safe settings for SLOW background fill (gets ALL stations over ~25 min)
+# Rate-limit safe settings for SLOW background fill
 SLOW_BATCH_SIZE = 5
-SLOW_BATCH_DELAY = 12.0  # 5 req per 12s = 25 req/min (well under 60/min limit)
+SLOW_BATCH_DELAY = 12.0
 
 MAX_STATIONS = 700
+
+# Cache TTL — 6 hours for live data (OpenAQ updates ~hourly but we don't need to hammer it)
+LIVE_CACHE_TTL = 21600  # 6 hours
+FALLBACK_CACHE_TTL = 43200  # 12 hours for dataset fallback
 
 # State tracking
 _refresh_in_progress = False
@@ -46,6 +52,60 @@ _slow_fill_running = False
 def _headers() -> dict:
     """Return auth headers for OpenAQ API."""
     return {"X-API-Key": OPENAQ_API_KEY} if OPENAQ_API_KEY else {}
+
+
+def _load_fallback_data() -> List[Dict]:
+    """
+    Load latest AQI data from the ML dataset as a fallback.
+    This ensures the map ALWAYS has data, even when OpenAQ is down.
+    """
+    csv_path = DATA_DIR / "ml_dataset_cleaned.csv"
+    if not csv_path.exists():
+        return []
+
+    try:
+        df = pd.read_csv(csv_path)
+        df["date"] = pd.to_datetime(df["date"])
+        # Get latest row per station
+        latest = df.sort_values("date").groupby("station_id").last().reset_index()
+
+        # Load station names from stations.json
+        import json
+        stations_file = DATA_DIR / "stations.json"
+        id_to_name = {}
+        if stations_file.exists():
+            with open(stations_file) as f:
+                for s in json.load(f):
+                    id_to_name[s["station_id"]] = s["station_name"]
+
+        cities: List[Dict] = []
+        for _, row in latest.iterrows():
+            sid = str(int(row["station_id"]))
+            pm25 = row.get("pm25", 0)
+            if pm25 is None or pd.isna(pm25) or pm25 < 0:
+                continue
+
+            aqi = _pm25_to_aqi(float(pm25))
+            name = id_to_name.get(sid, f"Station {sid}")
+
+            cities.append({
+                "city": name,
+                "lat": float(row["lat"]),
+                "lon": float(row["lon"]),
+                "aqi": aqi,
+                "pm25": round(float(pm25), 1),
+                "pm10": round(float(row.get("pm10", 0) or 0), 1) if "pm10" in row.index else None,
+                "dominant_pollutant": "pm25",
+                "source": "dataset_fallback",
+                "location_id": int(row["station_id"]),
+            })
+
+        cities.sort(key=lambda x: x["aqi"], reverse=True)
+        return cities
+
+    except Exception as e:
+        print(f"⚠ Fallback data load failed: {e}")
+        return []
 
 
 def _pm25_to_aqi(pm25: float) -> int:
@@ -380,16 +440,35 @@ def _merge_into_cache(new_cities: List[Dict]):
         existing_map[c["location_id"]] = c
 
     merged = sorted(existing_map.values(), key=lambda x: x["aqi"], reverse=True)
-    cache.set("live:india_cities", merged, CacheTTL.CURRENT_AQI)
+    cache.set("live:india_cities", merged, LIVE_CACHE_TTL)
 
 
 def start_slow_fill():
-    """Start the background slow fill task. Call this from app startup."""
+    """
+    Start the background slow fill task.
+    Only runs if cache is empty AND OpenAQ key is valid.
+    Does NOT auto-trigger on every startup.
+    """
+    cache = get_cache()
+    existing = cache.get("live:india_cities")
+    if existing:
+        print(f"✓ Live data already cached ({len(existing)} stations) — skipping OpenAQ fetch")
+        return
+
+    if not OPENAQ_API_KEY:
+        # No API key — use fallback data immediately
+        fallback = _load_fallback_data()
+        if fallback:
+            cache.set("live:india_cities", fallback, FALLBACK_CACHE_TTL)
+            print(f"✓ Loaded {len(fallback)} stations from dataset fallback")
+        return
+
+    # Only fetch from OpenAQ if cache is truly empty
     asyncio.ensure_future(_slow_fill_all_stations())
 
 
 async def _background_refresh():
-    """Background task to do a fast refresh and merge into cache."""
+    """Manual refresh — only called via explicit API trigger, never automatic."""
     global _refresh_in_progress
     if _refresh_in_progress:
         return
@@ -400,9 +479,9 @@ async def _background_refresh():
             _merge_into_cache(cities)
             cache = get_cache()
             total = len(cache.get("live:india_cities") or [])
-            print(f"✓ Background refresh: merged {len(cities)} stations (total: {total})")
+            print(f"✓ Manual refresh: merged {len(cities)} stations (total: {total})")
     except Exception as e:
-        print(f"⚠ Background refresh failed: {e}")
+        print(f"⚠ Refresh failed: {e}")
     finally:
         _refresh_in_progress = False
 
@@ -410,49 +489,37 @@ async def _background_refresh():
 @router.get("/cities")
 async def get_live_cities(background_tasks: BackgroundTasks):
     """
-    Get live AQI for all active stations in India using OpenAQ v3 API.
-    Returns cached data immediately. First call triggers fast fetch + slow background fill.
+    Get live AQI for all active stations in India.
+    Primary: OpenAQ live data (cached 6 hours).
+    Fallback: Latest data from ML dataset (always available, cached 12 hours).
+    No aggressive polling — only refreshes when cache is completely expired.
     """
     cache = get_cache()
 
-    # Check cache first — instant response
+    # Check cache first — instant response, no background refresh
     cached = cache.get("live:india_cities")
     if cached:
-        # Schedule background refresh if TTL is low
-        ttl = cache.get_ttl("live:india_cities")
-        if ttl < 600:
-            background_tasks.add_task(_background_refresh)
-            background_tasks.add_task(_slow_fill_all_stations)
         return {"cities": cached, "source": "cache", "count": len(cached)}
 
-    if not OPENAQ_API_KEY:
-        return {"cities": [], "source": "error", "error": "No OPENAQ_API_KEY in .env"}
+    # No cache — try OpenAQ first (only if key is set)
+    if OPENAQ_API_KEY:
+        try:
+            cities = await _fast_fetch()
+            if cities:
+                cache.set("live:india_cities", cities, LIVE_CACHE_TTL)
+                # Only do slow fill once after a successful fast fetch
+                background_tasks.add_task(_slow_fill_all_stations)
+                return {"cities": cities, "source": "openaq_live", "count": len(cities)}
+        except Exception:
+            pass
 
-    # No cache — do a fast fetch (gets ~60 stations quickly)
-    try:
-        cities = await _fast_fetch()
+    # Fallback: serve from dataset (always works, no API calls)
+    fallback = _load_fallback_data()
+    if fallback:
+        cache.set("live:india_cities", fallback, FALLBACK_CACHE_TTL)
+        return {"cities": fallback, "source": "dataset_fallback", "count": len(fallback)}
 
-        if not cities:
-            return {
-                "cities": [],
-                "source": "error",
-                "error": "Rate limited by OpenAQ — data will populate in background. Retry in 1 min.",
-            }
-
-        # Cache for 1 hour
-        cache.set("live:india_cities", cities, CacheTTL.CURRENT_AQI)
-
-        # Kick off slow background fill to get remaining stations
-        background_tasks.add_task(_slow_fill_all_stations)
-
-        return {
-            "cities": cities,
-            "source": "openaq_live",
-            "count": len(cities),
-        }
-
-    except Exception as e:
-        return {"cities": [], "source": "error", "error": str(e)[:200]}
+    return {"cities": [], "source": "error", "error": "No data available"}
 
 
 @router.get("/city/{city_name}")

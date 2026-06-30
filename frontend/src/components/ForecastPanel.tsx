@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Info, Activity, Cpu, Search } from "lucide-react";
-import { stations } from "@/lib/data";
+import { useStations, fetchStations } from "@/lib/data";
 import { getAqiColor, getAqiCategory } from "@/lib/aqi";
 import { fetchSnapshot, StationSnapshot } from "@/lib/api";
 
@@ -11,6 +11,7 @@ interface ForecastPanelProps {
 }
 
 export default function ForecastPanel({ stationId: initialStationId }: ForecastPanelProps) {
+  const stations = useStations();
   const [snapshot, setSnapshot] = useState<StationSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -163,7 +164,7 @@ export default function ForecastPanel({ stationId: initialStationId }: ForecastP
         <p className="text-xs text-secondary leading-relaxed">
           {modelStatus === "trained"
             ? "Predictions from trained XGBoost model using real station features (61 features including lags, weather, fire, and land-use data)."
-            : "Backend API not reachable. Start it with: cd api && python3 -m uvicorn main:app --reload --port 8000"}
+            : "Using mock predictions. Train the ML model to enable live XGBoost forecasts."}
         </p>
       </div>
     </div>
@@ -171,6 +172,7 @@ export default function ForecastPanel({ stationId: initialStationId }: ForecastP
 }
 
 function EmptyState({ onSelect }: { onSelect?: (id: string) => void }) {
+  const stations = useStations();
   const [search, setSearch] = useState("");
   const filtered = stations.filter((s) =>
     s.station_name.toLowerCase().includes(search.toLowerCase())
@@ -197,8 +199,8 @@ function EmptyState({ onSelect }: { onSelect?: (id: string) => void }) {
             className="bg-transparent text-sm outline-none w-full placeholder:text-muted"
           />
         </div>
-        <div className="max-h-64 overflow-y-auto space-y-1">
-          {(search ? filtered : stations).slice(0, 15).map((s) => (
+        <div className="max-h-96 overflow-y-auto space-y-1">
+          {(search ? filtered : stations).map((s) => (
             <button
               key={s.station_id}
               onClick={() => onSelect?.(s.station_id)}

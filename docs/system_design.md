@@ -184,13 +184,16 @@ aeris:advisory:very_poor:vehicular_traffic:hi:worsening  → precomputed LLM adv
 
 | Data Type | TTL | Why |
 |-----------|-----|-----|
-| Current AQI | 1 hour | Stations report hourly |
+| Live AQI (OpenAQ) | 6 hours | Avoid rate-limit bans, data updates hourly |
+| Live AQI (fallback) | 12 hours | Dataset doesn't change frequently |
 | Forecasts | 6 hours | Models run every 6h |
-| Attribution | 6 hours | SHAP values stable over hours |
+| Attribution | 6 hours | Feature values stable over hours |
 | Enforcement | 6 hours | Priorities shift slowly |
 | Advisories | 2 hours | Content may need refresh |
-| Snapshots | 1 hour | Assemblage of above |
+| Snapshots | 6 hours | Assemblage of above |
 | Station metadata | 24 hours | Rarely changes |
+
+**Important:** Redis persists to disk (RDB) every 60 seconds. Cache survives server restarts.
 
 ### How the fallback works
 
@@ -220,17 +223,23 @@ The scheduler is the heart of AERIS's performance story. It:
 
 | Step | What | Count | Where it's stored |
 |------|------|-------|-------------------|
-| 1 | Forecast (1/2/3 day) per station | 30 stations × 3 days | `forecast:{station_id}` |
-| 2 | Source attribution per station | 30 stations | `attribution:{station_id}` |
+| 1 | Forecast (1/2/3 day) per station | 88 stations × 3 days | `forecast:{station_id}` |
+| 2 | Source attribution per station | 88 stations (real features) | `attribution:{station_id}` |
 | 3 | Enforcement priorities (city-wide) | Top 10 ranked | `enforcement:city_recommendations` |
 | 4 | LLM advisories (all combos) | Up to 180 | `advisory:{bucket}:{src}:{lang}:{trend}` |
-| 5 | Aggregate snapshots | 30 stations | `snapshot:{station_id}` |
+| 5 | Aggregate snapshots | 88 stations | `snapshot:{station_id}` |
 
 ### Time to complete
 
-On a MacBook Air: **< 0.1 seconds** for all 30 stations.
+On a MacBook Air: **< 0.3 seconds** for all 88 stations (with trained XGBoost model).
 
-With real models (heavier inference): estimated **5-15 seconds** for 94 stations. Still trivially fast for a background job.
+### Live AQI data (separate from precomputation)
+
+The `/api/live/cities` endpoint handles real-time map data:
+- **Primary:** OpenAQ v3 API (all India, 600+ stations) — cached 6 hours
+- **Fallback:** Latest PM2.5 from `ml_dataset_cleaned.csv` — cached 12 hours
+- The map **never** shows empty. Fallback activates automatically on API failure.
+- No aggressive polling — only fetches when cache is completely expired.
 
 ---
 
@@ -382,15 +391,22 @@ Every external dependency can fail. AERIS never shows an error to users — it d
 
 ```
 ┌─ Forecast ────────────────────────────────────────────────┐
-│  Level 1: Trained XGBoost model (.joblib)                 │
-│  Level 2: Persistence baseline (yesterday's value)        │
+│  Level 1: Trained XGBoost model (xgb_day1.joblib)         │
+│  Level 2: Current PM2.5 with decay (when model undershoots)│
 │  Level 3: Last cached forecast from Redis                 │
+│  Level 4: Mock predictions (deterministic, station-based) │
 └───────────────────────────────────────────────────────────┘
 
 ┌─ Attribution ─────────────────────────────────────────────┐
-│  Level 1: SHAP explainer on trained model                 │
-│  Level 2: Feature-magnitude heuristic                     │
+│  Level 1: SHAP explainer (if shap_explainer.joblib exists)│
+│  Level 2: Feature-group heuristic (real features per stn) │
 │  Level 3: Deterministic mock based on station profile     │
+└───────────────────────────────────────────────────────────┘
+
+┌─ Live AQI (Map) ─────────────────────────────────────────┐
+│  Level 1: OpenAQ v3 API (600+ India stations)             │
+│  Level 2: Dataset fallback (88 Delhi stations from CSV)   │
+│  Never shows empty map.                                   │
 └───────────────────────────────────────────────────────────┘
 
 ┌─ Advisory ────────────────────────────────────────────────┐
@@ -400,7 +416,7 @@ Every external dependency can fail. AERIS never shows an error to users — it d
 └───────────────────────────────────────────────────────────┘
 
 ┌─ Cache ───────────────────────────────────────────────────┐
-│  Level 1: Redis (persistent, shared)                      │
+│  Level 1: Redis (persistent, shared, survives restarts)   │
 │  Level 2: In-memory LRU (automatic fallback)              │
 └───────────────────────────────────────────────────────────┘
 ```
@@ -557,12 +573,14 @@ Everything functions identically, but cache doesn't persist across restarts.
 
 | Metric | Value |
 |--------|-------|
-| Full precomputation (30 stations) | 0.05 seconds |
-| Cache entries after precompute | 271 |
+| Full precomputation (88 stations) | 0.23 seconds |
+| Cache entries after precompute | ~500 |
 | Advisory variants pre-cached | 180 |
 | Redis cache hit rate (steady state) | 100% |
 | User request latency (from Redis) | < 5ms |
 | User request latency (live pipeline) | 3-8 seconds |
+| Live AQI stations (OpenAQ) | 200-600 (India) |
+| Live AQI stations (fallback) | 88 (Delhi, always available) |
 
 ### Latency comparison
 

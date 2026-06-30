@@ -1,32 +1,1058 @@
 [
-  {"station_id": "delhi_anand_vihar", "station_name": "Anand Vihar, DPCC", "city": "Delhi", "lat": 28.6469, "lon": 77.3164, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_ito", "station_name": "ITO, DPCC", "city": "Delhi", "lat": 28.6289, "lon": 77.2415, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_r_k_puram", "station_name": "R K Puram, DPCC", "city": "Delhi", "lat": 28.5631, "lon": 77.1726, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_mandir_marg", "station_name": "Mandir Marg, DPCC", "city": "Delhi", "lat": 28.6364, "lon": 77.2009, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_punjabi_bagh", "station_name": "Punjabi Bagh, DPCC", "city": "Delhi", "lat": 28.6742, "lon": 77.1310, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_dwarka_sec8", "station_name": "Dwarka Sector 8, DPCC", "city": "Delhi", "lat": 28.5823, "lon": 77.0500, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_rohini", "station_name": "Rohini, DPCC", "city": "Delhi", "lat": 28.7326, "lon": 77.1101, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_jahangirpuri", "station_name": "Jahangirpuri, DPCC", "city": "Delhi", "lat": 28.7256, "lon": 77.1723, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_wazirpur", "station_name": "Wazirpur, DPCC", "city": "Delhi", "lat": 28.6969, "lon": 77.1547, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_siri_fort", "station_name": "Siri Fort, DPCC", "city": "Delhi", "lat": 28.5504, "lon": 77.2158, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_okhla_phase2", "station_name": "Okhla Phase 2, DPCC", "city": "Delhi", "lat": 28.5310, "lon": 77.2710, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_nehru_nagar", "station_name": "Nehru Nagar, DPCC", "city": "Delhi", "lat": 28.5679, "lon": 77.2503, "pollutants": ["PM2.5", "PM10"]},
-  {"station_id": "delhi_patparganj", "station_name": "Patparganj, DPCC", "city": "Delhi", "lat": 28.6236, "lon": 77.2872, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_mundka", "station_name": "Mundka, DPCC", "city": "Delhi", "lat": 28.6840, "lon": 77.0310, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_bawana", "station_name": "Bawana, DPCC", "city": "Delhi", "lat": 28.7762, "lon": 77.0510, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_narela", "station_name": "Narela, DPCC", "city": "Delhi", "lat": 28.8229, "lon": 77.1026, "pollutants": ["PM2.5", "PM10"]},
-  {"station_id": "delhi_alipur", "station_name": "Alipur, DPCC", "city": "Delhi", "lat": 28.7951, "lon": 77.1537, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_ashok_vihar", "station_name": "Ashok Vihar, DPCC", "city": "Delhi", "lat": 28.6953, "lon": 77.1818, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_chandni_chowk", "station_name": "Chandni Chowk, IITM", "city": "Delhi", "lat": 28.6506, "lon": 77.2296, "pollutants": ["PM2.5", "PM10"]},
-  {"station_id": "delhi_lodhi_road", "station_name": "Lodhi Road, IMD", "city": "Delhi", "lat": 28.5918, "lon": 77.2273, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_dtu", "station_name": "DTU, CPCB", "city": "Delhi", "lat": 28.7500, "lon": 77.1113, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_aya_nagar", "station_name": "Aya Nagar, DPCC", "city": "Delhi", "lat": 28.4707, "lon": 77.1099, "pollutants": ["PM2.5", "PM10"]},
-  {"station_id": "delhi_pusa", "station_name": "Pusa, DPCC", "city": "Delhi", "lat": 28.6397, "lon": 77.1461, "pollutants": ["PM2.5", "PM10", "NO2", "O3"]},
-  {"station_id": "delhi_shadipur", "station_name": "Shadipur, CPCB", "city": "Delhi", "lat": 28.6515, "lon": 77.1580, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_north_campus", "station_name": "North Campus DU, DPCC", "city": "Delhi", "lat": 28.6886, "lon": 77.2095, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_major_dhyan_chand", "station_name": "Major Dhyan Chand Stadium, DPCC", "city": "Delhi", "lat": 28.6113, "lon": 77.2379, "pollutants": ["PM2.5", "PM10"]},
-  {"station_id": "delhi_mathura_road", "station_name": "Mathura Road, DPCC", "city": "Delhi", "lat": 28.5718, "lon": 77.2509, "pollutants": ["PM2.5", "PM10", "NO2"]},
-  {"station_id": "delhi_vivek_vihar", "station_name": "Vivek Vihar, DPCC", "city": "Delhi", "lat": 28.6727, "lon": 77.3150, "pollutants": ["PM2.5", "PM10"]},
-  {"station_id": "delhi_najafgarh", "station_name": "Najafgarh, DPCC", "city": "Delhi", "lat": 28.5704, "lon": 76.9799, "pollutants": ["PM2.5", "PM10"]},
-  {"station_id": "delhi_satyawati_college", "station_name": "Satyawati College, DPCC", "city": "Delhi", "lat": 28.6973, "lon": 77.1909, "pollutants": ["PM2.5", "PM10"]}
+  {
+    "station_id": "6932",
+    "station_name": "Alipur, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.815329,
+    "lon": 77.15301,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5509",
+    "station_name": "Anand Vihar, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.647622,
+    "lon": 77.315809,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "10487",
+    "station_name": "Anand Vihar, Delhi - DPCC (III)",
+    "city": "Delhi",
+    "lat": 28.646835,
+    "lon": 77.316032,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "235",
+    "station_name": "Anand Vihar, New Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.646835,
+    "lon": 77.316032,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5766",
+    "station_name": "Ashok Vihar, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.563954,
+    "lon": 77.258787,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "8475",
+    "station_name": "Ashok Vihar, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.710508,
+    "lon": 77.249485,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5570",
+    "station_name": "Aya Nagar, Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.474261,
+    "lon": 77.131606,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "7005",
+    "station_name": "Bawana, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.757294,
+    "lon": 77.278792,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6957",
+    "station_name": "CRRI Mathura Road, IMD (II)",
+    "city": "Delhi",
+    "lat": 28.58028,
+    "lon": 77.233829,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5627",
+    "station_name": "CRRI Mathura Road, New Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.551201,
+    "lon": 77.273574,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "4712609",
+    "station_name": "Central Delhi - IITM",
+    "city": "Delhi",
+    "lat": 28.623056,
+    "lon": 77.234167,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "8118",
+    "station_name": "Chandni Chowk, Delhi - IITM",
+    "city": "Delhi",
+    "lat": 28.63576,
+    "lon": 77.22445,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5626",
+    "station_name": "DTU, New Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.75005,
+    "lon": 77.111261,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6254665",
+    "station_name": "Defence Colony, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.615828,
+    "lon": 77.271992,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "13",
+    "station_name": "Delhi Technological University, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.744,
+    "lon": 77.12,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5759",
+    "station_name": "Dilshad Garden, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.67795,
+    "lon": 77.29868,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6938",
+    "station_name": "Dilshad Garden, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.672342,
+    "lon": 77.31526,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6931",
+    "station_name": "Dwarka Sector 8, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.571027,
+    "lon": 77.071901,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "4663956",
+    "station_name": "Dwarka, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.5266,
+    "lon": 77.1493,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5639",
+    "station_name": "East Arjun Nagar, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.56461,
+    "lon": 77.16701,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6105800",
+    "station_name": "East Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.583491,
+    "lon": 77.431714,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5617",
+    "station_name": "Faridabad, Haryana - HSPCB",
+    "city": "Delhi",
+    "lat": 28.408842,
+    "lon": 77.309908,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6986",
+    "station_name": "Greater Noida - UPPCB",
+    "city": "Delhi",
+    "lat": 28.557054,
+    "lon": 77.453663,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6359",
+    "station_name": "IHBAS, DPCC (III)",
+    "city": "Delhi",
+    "lat": 28.681174,
+    "lon": 77.302523,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "431",
+    "station_name": "IHBAS, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.6821,
+    "lon": 77.305,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5753",
+    "station_name": "IHBAS, Delhi - CPCB (II)",
+    "city": "Delhi",
+    "lat": 28.66878,
+    "lon": 77.313098,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5613",
+    "station_name": "ITO, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.628624,
+    "lon": 77.24106,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6929",
+    "station_name": "ITO, Delhi - CPCB (II)",
+    "city": "Delhi",
+    "lat": 28.611281,
+    "lon": 77.237738,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "10489",
+    "station_name": "ITO, Delhi - CPCB (III)",
+    "city": "Delhi",
+    "lat": 28.628624,
+    "lon": 77.24106,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "103",
+    "station_name": "Income Tax Office, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.6235,
+    "lon": 77.2494,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5541",
+    "station_name": "Jahangirpuri, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.72565,
+    "lon": 77.201157,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6254663",
+    "station_name": "Janakpuri, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.540721,
+    "lon": 77.168544,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5634",
+    "station_name": "Lodhi Road, Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.591825,
+    "lon": 77.227307,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5754",
+    "station_name": "Lodhi Road, Delhi - IMD (II)",
+    "city": "Delhi",
+    "lat": 28.58285,
+    "lon": 77.232178,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "11607",
+    "station_name": "Lodhi Road, Delhi - IMD (III)",
+    "city": "Delhi",
+    "lat": 28.588333,
+    "lon": 77.221667,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5742",
+    "station_name": "Loni, Ghaziabad - UPPCB",
+    "city": "Delhi",
+    "lat": 28.631049,
+    "lon": 77.284622,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6960",
+    "station_name": "Loni, Ghaziabad - UPPCB (II)",
+    "city": "Delhi",
+    "lat": 28.623748,
+    "lon": 77.287205,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5650",
+    "station_name": "Major Dhyan Chand Stadium, Delhi",
+    "city": "Delhi",
+    "lat": 28.562776,
+    "lon": 77.118005,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6358",
+    "station_name": "Mandir Marg, DPCC (III)",
+    "city": "Delhi",
+    "lat": 28.636429,
+    "lon": 77.201067,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "236",
+    "station_name": "Mandir Marg, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.6341,
+    "lon": 77.2005,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5641",
+    "station_name": "Mandir Marg, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.637269,
+    "lon": 77.20056,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "2860223",
+    "station_name": "Mathura Road, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.550005,
+    "lon": 77.243106,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6119272",
+    "station_name": "Mayur Vihar, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.658398,
+    "lon": 77.378053,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6257818",
+    "station_name": "Moti Bagh, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.594169,
+    "lon": 77.1251,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5622",
+    "station_name": "Mundka, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.60909,
+    "lon": 77.032541,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "10486",
+    "station_name": "Mundka, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.684678,
+    "lon": 77.076574,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5581",
+    "station_name": "NSIT Dwarka, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.610304,
+    "lon": 77.099694,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "8472",
+    "station_name": "Najafgarh, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.7762,
+    "lon": 77.051074,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5743",
+    "station_name": "Narela, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.740706,
+    "lon": 77.057749,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "10831",
+    "station_name": "Narela, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.732528,
+    "lon": 77.11992,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5765",
+    "station_name": "Nehru Nagar, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.536641,
+    "lon": 77.266459,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "8365",
+    "station_name": "Nehru Nagar, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.56789,
+    "lon": 77.250515,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6934",
+    "station_name": "Noida Sector-1, UPPCB",
+    "city": "Delhi",
+    "lat": 28.498571,
+    "lon": 77.26484,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6988",
+    "station_name": "Noida Sector-125 - UPPCB",
+    "city": "Delhi",
+    "lat": 28.56923,
+    "lon": 77.393848,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5744",
+    "station_name": "Noida Sector-62 - UPPCB",
+    "city": "Delhi",
+    "lat": 28.499731,
+    "lon": 77.264907,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "8235",
+    "station_name": "North Campus DU, Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.73282,
+    "lon": 77.170633,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6980",
+    "station_name": "Okhla Phase-2, DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.589247,
+    "lon": 77.321962,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "8239",
+    "station_name": "Okhla Phase-2, DPCC (III)",
+    "city": "Delhi",
+    "lat": 28.530785,
+    "lon": 77.271255,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5598",
+    "station_name": "Okhla Phase-2, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.544761,
+    "lon": 77.323126,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5616",
+    "station_name": "Patparganj, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.624548,
+    "lon": 77.35771,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6924",
+    "station_name": "Patparganj, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.646233,
+    "lon": 77.358075,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6357",
+    "station_name": "Punjabi Bagh, DPCC (III)",
+    "city": "Delhi",
+    "lat": 28.674045,
+    "lon": 77.131023,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "50",
+    "station_name": "Punjabi Bagh, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.674045,
+    "lon": 77.131023,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5540",
+    "station_name": "Punjabi Bagh, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.667086,
+    "lon": 77.130125,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6356",
+    "station_name": "Pusa, DPCC (IV)",
+    "city": "Delhi",
+    "lat": 28.639645,
+    "lon": 77.146262,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5610",
+    "station_name": "Pusa, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.657381,
+    "lon": 77.158545,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5404",
+    "station_name": "Pusa, Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.639645,
+    "lon": 77.146263,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5630",
+    "station_name": "Pusa, New Delhi - DPCC (III)",
+    "city": "Delhi",
+    "lat": 28.651478,
+    "lon": 77.147311,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "17",
+    "station_name": "R K Puram, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.563262,
+    "lon": 77.186937,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "7044",
+    "station_name": "R K Puram, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.563262,
+    "lon": 77.186937,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5761",
+    "station_name": "Rohini, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.725837,
+    "lon": 77.160563,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6145551",
+    "station_name": "Saket, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.5587,
+    "lon": 77.21886,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6254666",
+    "station_name": "Saket, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.493624,
+    "lon": 77.201159,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "10484",
+    "station_name": "Satyawati College, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.531346,
+    "lon": 77.190156,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "10900",
+    "station_name": "Sector-6, Faridabad - HSPCB",
+    "city": "Delhi",
+    "lat": 28.4275,
+    "lon": 77.1465,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "10921",
+    "station_name": "Sector-6, Faridabad - HSPCB (II)",
+    "city": "Delhi",
+    "lat": 28.422681,
+    "lon": 77.148944,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "2587",
+    "station_name": "Sector16A, Faridabad - HSPCB",
+    "city": "Delhi",
+    "lat": 28.410122,
+    "lon": 77.313775,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "10820",
+    "station_name": "Sector16A, Faridabad - HSPCB (II)",
+    "city": "Delhi",
+    "lat": 28.4417,
+    "lon": 77.3217,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "2503",
+    "station_name": "Shadipur, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.6517,
+    "lon": 77.1581,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "11603",
+    "station_name": "Shadipur, Delhi - CPCB (II)",
+    "city": "Delhi",
+    "lat": 28.656756,
+    "lon": 77.227234,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5586",
+    "station_name": "Siri Fort, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.550425,
+    "lon": 77.215938,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "3409496",
+    "station_name": "South Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.57834,
+    "lon": 77.184,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6254594",
+    "station_name": "South Ex, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.62181,
+    "lon": 77.194463,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "6148686",
+    "station_name": "Vasant Kunj, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.54246,
+    "lon": 77.191651,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5665",
+    "station_name": "Vivek Vihar, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.660335,
+    "lon": 77.357256,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "5762",
+    "station_name": "Wazirpur, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.69572,
+    "lon": 77.181295,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "8915",
+    "station_name": "Wazirpur, Delhi - DPCC (II)",
+    "city": "Delhi",
+    "lat": 28.699793,
+    "lon": 77.165453,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  },
+  {
+    "station_id": "8917",
+    "station_name": "Wazirpur, Delhi - DPCC (III)",
+    "city": "Delhi",
+    "lat": 28.695381,
+    "lon": 77.181665,
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2"
+    ]
+  }
 ]

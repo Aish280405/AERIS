@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { PieChart as PieIcon, Sparkles } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { stations } from "@/lib/data";
+import { useStations, fetchStations } from "@/lib/data";
 import { fetchSnapshot, StationSnapshot } from "@/lib/api";
 
 interface AttributionPanelProps {
@@ -28,9 +28,20 @@ const sourceLabels: Record<string, string> = {
   secondary_particles: "Secondary Particles",
 };
 
-export default function AttributionPanel({ stationId }: AttributionPanelProps) {
+export default function AttributionPanel({ stationId: initialStationId }: AttributionPanelProps) {
+  const stations = useStations();
   const [snapshot, setSnapshot] = useState<StationSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
+  const [stationId, setStationId] = useState(initialStationId);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  // Fetch station list
+  useEffect(() => { fetchStations(); }, []);
+
+  useEffect(() => {
+    if (initialStationId) setStationId(initialStationId);
+  }, [initialStationId]);
 
   useEffect(() => {
     if (!stationId) return;
@@ -42,8 +53,11 @@ export default function AttributionPanel({ stationId }: AttributionPanelProps) {
   }, [stationId]);
 
   const station = stations.find((s) => s.station_id === stationId);
+  const filtered = stations.filter((s) =>
+    s.station_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  if (!stationId) return <EmptyState />;
+  if (!stationId) return <EmptyState onSelect={setStationId} />;
   if (loading) {
     return (
       <div className="card h-full flex items-center justify-center">
@@ -60,6 +74,53 @@ export default function AttributionPanel({ stationId }: AttributionPanelProps) {
 
   return (
     <div className="h-full flex flex-col gap-5 animate-fade-in">
+      {/* Station search */}
+      <div className="card !p-4">
+        <div className="relative">
+          <div className="flex items-center gap-2 surface-subtle px-3 py-2.5 rounded-xl">
+            <PieIcon size={15} className="text-muted shrink-0" />
+            <input
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowDropdown(true);
+              }}
+              onFocus={() => setShowDropdown(true)}
+              placeholder="Search stations..."
+              className="bg-transparent text-sm outline-none w-full placeholder:text-muted"
+            />
+            {station && (
+              <span className="text-xs text-[var(--accent)] font-medium whitespace-nowrap">
+                {station.station_name.split(",")[0]}
+              </span>
+            )}
+          </div>
+          {showDropdown && searchQuery && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setShowDropdown(false)} />
+              <div className="absolute z-40 top-full mt-2 w-full max-h-48 overflow-y-auto surface rounded-xl shadow-xl p-2">
+                {filtered.map((s) => (
+                  <button
+                    key={s.station_id}
+                    onClick={() => {
+                      setStationId(s.station_id);
+                      setSearchQuery("");
+                      setShowDropdown(false);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-[var(--bg-subtle)] transition-colors text-secondary"
+                  >
+                    {s.station_name}
+                  </button>
+                ))}
+                {filtered.length === 0 && (
+                  <p className="px-3 py-2 text-sm text-muted">No stations found</p>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Donut */}
         <div className="card">
@@ -157,15 +218,45 @@ export default function AttributionPanel({ stationId }: AttributionPanelProps) {
   );
 }
 
-function EmptyState() {
+function EmptyState({ onSelect }: { onSelect?: (id: string) => void }) {
+  const stations = useStations();
+  const [search, setSearch] = useState("");
+  const filtered = stations.filter((s) =>
+    s.station_name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="card h-full flex flex-col items-center justify-center text-center gap-3">
-      <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[var(--accent-soft)]">
-        <PieIcon size={26} className="text-[var(--accent)]" />
-      </span>
-      <div>
-        <p className="font-medium">No station selected</p>
-        <p className="text-sm text-muted mt-1">Pick a station on the Map to see source attribution</p>
+    <div className="h-full flex flex-col gap-5">
+      <div className="card flex flex-col items-center justify-center text-center gap-4 py-12">
+        <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[var(--accent-soft)]">
+          <PieIcon size={26} className="text-[var(--accent)]" />
+        </span>
+        <div>
+          <p className="font-medium">No station selected</p>
+          <p className="text-sm text-muted mt-1">Search or pick a station to see source attribution</p>
+        </div>
+      </div>
+      <div className="card !p-4">
+        <div className="flex items-center gap-2 surface-subtle px-3 py-2.5 rounded-xl mb-3">
+          <PieIcon size={15} className="text-muted" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search stations..."
+            className="bg-transparent text-sm outline-none w-full placeholder:text-muted"
+          />
+        </div>
+        <div className="max-h-96 overflow-y-auto space-y-1">
+          {(search ? filtered : stations).map((s) => (
+            <button
+              key={s.station_id}
+              onClick={() => onSelect?.(s.station_id)}
+              className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-[var(--bg-subtle)] transition-colors text-secondary"
+            >
+              {s.station_name}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

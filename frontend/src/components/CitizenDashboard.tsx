@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { stations } from "@/lib/data";
+import { useStations, fetchStations } from "@/lib/data";
 import {
   getAqiColor,
   getAqiCategory,
@@ -103,18 +103,34 @@ function buildForecast(stationId: string, lang: Lang) {
 
 // ─── Component ──────────────────────────────────────
 export default function CitizenDashboard() {
-  const [selectedStationId, setSelectedStationId] = useState(
-    stations[0].station_id
-  );
+  const stations = useStations();
+  const [selectedStationId, setSelectedStationId] = useState<string>("");
   const { language, setLanguage, t: strings } = useLanguage();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const station = stations.find((s) => s.station_id === selectedStationId)!;
+  // Set default station once loaded
+  useEffect(() => {
+    if (stations.length > 0 && !selectedStationId) {
+      setSelectedStationId(stations[0].station_id);
+    }
+  }, [stations, selectedStationId]);
+
+  const station = stations.find((s) => s.station_id === selectedStationId);
   const [snapshot, setSnapshot] = useState<StationSnapshot | null>(null);
 
   useEffect(() => {
+    if (!selectedStationId) return;
     fetchSnapshot(selectedStationId).then((data) => setSnapshot(data));
   }, [selectedStationId]);
+
+  // Loading state while stations are being fetched
+  if (!station || !selectedStationId) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="w-6 h-6 border-2 border-[var(--accent)]/30 border-t-[var(--accent)] rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   // Use real data if available, fallback to mock
   const aqi = snapshot ? snapshot.current_aqi : mockAqiForStation(selectedStationId);
